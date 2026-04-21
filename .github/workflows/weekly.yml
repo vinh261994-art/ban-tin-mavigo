@@ -1,0 +1,64 @@
+# ==========================================================
+#  BẢN TIN MAVIGO — WEEKLY DEEP REPORT
+# ==========================================================
+#  Chạy 9h sáng VN thứ Hai hàng tuần (= 02:00 UTC Monday).
+#  Tổng kết 7 ngày, deep query YTrends (trending + hidden gems),
+#  Gemini viết narrative đanh đá, gửi Telegram.
+#
+#  YÊU CẦU SECRETS:
+#    TELEGRAM_BOT_TOKEN
+#    TELEGRAM_CHAT_ID
+#    GEMINI_API_KEY     — dùng key từ Google AI Studio
+#                         (https://aistudio.google.com/apikey)
+#
+#  Nếu Gemini fail (quota, key sai, etc), script tự fallback
+#  sang template text — bản tin vẫn gửi được.
+# ==========================================================
+
+name: Weekly Deep Report
+
+on:
+  schedule:
+    # 02:00 UTC Monday = 09:00 VN Monday
+    - cron: "0 2 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: mavigo-weekly
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run weekly report
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PYTHONIOENCODING: utf-8
+        run: python scripts/weekly_report.py
+
+      - name: Commit updated state files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(data): update weekly state [skip ci]"
+          file_pattern: "data/*.json"
+          commit_user_name: "mavigo-bot"
+          commit_user_email: "mavigo-bot@users.noreply.github.com"

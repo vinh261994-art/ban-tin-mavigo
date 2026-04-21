@@ -1,0 +1,221 @@
+{
+  "_readme": "Dịp lễ & mùa bán hàng US/Global cho Etsy/eBay sellers. 'lead_days' = số ngày trước đó cần có listing sẵn. 'market' = thị trường chính (US / Global). Script chỉ filter các event trong 60 ngày tới từ hôm nay. Đã bỏ các dịp lễ riêng của VN.",
+  "holidays": [
+    {
+      "name": "Mother's Day",
+      "name_vi": "Ngày của Mẹ (Mỹ)",
+      "date": "2026-05-10",
+      "lead_days": 30,
+      "market": "US",
+      "categories": ["jewelry", "mug", "photo frame", "flowers", "handmade card", "necklace"],
+      "keywords": ["mom gift", "mother day", "best mom", "mama", "mother necklace"]
+    },
+    {
+      "name": "Graduation Season Peak",
+      "name_vi": "Mùa Tốt Nghiệp (đỉnh)",
+      "date": "2026-05-15",
+      "lead_days": 45,
+      "market": "US",
+      "categories": ["graduation gift", "grad cap", "college", "class of 2026", "teacher retirement"],
+      "keywords": ["graduation gift", "class of 2026", "grad gift", "college graduation", "senior gift", "grad cap", "graduation necklace", "teacher gift"]
+    },
+    {
+      "name": "Memorial Day",
+      "name_vi": "Ngày Tưởng Niệm (Mỹ)",
+      "date": "2026-05-25",
+      "lead_days": 14,
+      "market": "US",
+      "categories": ["patriotic", "flag", "veteran", "red white blue"],
+      "keywords": ["american flag", "memorial day", "veteran gift", "patriotic decor"]
+    },
+    {
+      "name": "Summer Wedding Peak",
+      "name_vi": "Mùa Cưới Hè (đỉnh)",
+      "date": "2026-06-15",
+      "lead_days": 60,
+      "market": "US",
+      "categories": ["wedding", "bridesmaid", "bridal shower", "wedding favor", "engagement"],
+      "keywords": ["bridesmaid gift", "bridal shower", "wedding favor", "mr mrs sign", "ring dish", "wedding guest book", "bachelorette", "wedding necklace", "bride gift"]
+    },
+    {
+      "name": "Father's Day",
+      "name_vi": "Ngày của Cha (Mỹ)",
+      "date": "2026-06-21",
+      "lead_days": 30,
+      "market": "US",
+      "categories": ["tools", "whiskey glass", "dad mug", "leather", "fishing", "bbq"],
+      "keywords": ["dad gift", "father day", "best dad", "papa", "grandpa"]
+    },
+    {
+      "name": "Independence Day",
+      "name_vi": "Quốc Khánh Mỹ",
+      "date": "2026-07-04",
+      "lead_days": 21,
+      "market": "US",
+      "categories": ["flag", "patriotic", "fireworks", "bbq"],
+      "keywords": ["4th of july", "independence day", "usa flag", "patriotic shirt"]
+    },
+    {
+      "name": "Back to School",
+      "name_vi": "Tựu Trường",
+      "date": "2026-08-15",
+      "lead_days": 30,
+      "market": "US",
+      "categories": ["supplies", "backpack", "teacher gift", "notebook", "planner"],
+      "keywords": ["back to school", "teacher gift", "first day school", "student"]
+    },
+    {
+      "name": "Labor Day",
+      "name_vi": "Ngày Lao Động (Mỹ)",
+      "date": "2026-09-07",
+      "lead_days": 14,
+      "market": "US",
+      "categories": ["sale", "clearance"],
+      "keywords": ["labor day sale"]
+    },
+    {
+      "name": "Fall Wedding Peak",
+      "name_vi": "Mùa Cưới Thu (đỉnh)",
+      "date": "2026-10-01",
+      "lead_days": 60,
+      "market": "US",
+      "categories": ["wedding", "bridesmaid", "rustic wedding", "fall wedding"],
+      "keywords": ["fall wedding", "rustic wedding", "bridesmaid gift", "wedding favor", "wedding sign", "boho wedding", "autumn wedding"]
+    },
+    {
+      "name": "Halloween",
+      "name_vi": "Halloween",
+      "date": "2026-10-31",
+      "lead_days": 45,
+      "market": "Global",
+      "categories": ["spooky", "pumpkin", "ghost", "witch", "skull", "costume", "halloween decor"],
+      "keywords": ["halloween", "spooky", "pumpkin", "ghost", "witch", "haunted", "trick or treat"]
+    },
+    {
+      "name": "Thanksgiving",
+      "name_vi": "Lễ Tạ Ơn (Mỹ)",
+      "date": "2026-11-26",
+      "lead_days": 21,
+      "market": "US",
+      "categories": ["fall decor", "turkey", "pumpkin", "family", "autumn"],
+      "keywords": ["thanksgiving", "fall decor", "autumn", "turkey", "grateful", "thankful"]
+    },
+    {
+      "name": "Black Friday",
+      "name_vi": "Black Friday",
+      "date": "2026-11-27",
+      "lead_days": 14,
+      "market": "Global",
+      "categories": ["sale", "discount", "promotion"],
+      "keywords": ["black friday", "sale", "discount", "deal"]
+    },
+    {
+      "name": "Cyber Monday",
+      "name_vi": "Cyber Monday",
+      "date": "2026-11-30",
+      "lead_days": 14,
+      "market": "Global",
+      "categories": ["sale", "online deal"],
+      "keywords": ["cyber monday", "online sale", "digital deal"]
+    },
+    {
+      "name": "Christmas",
+      "name_vi": "Giáng Sinh",
+      "date": "2026-12-25",
+      "lead_days": 60,
+      "market": "Global",
+      "categories": ["ornament", "tree decor", "christmas gift", "stocking", "santa", "snowman", "reindeer"],
+      "keywords": ["christmas", "xmas", "holiday", "santa", "ornament", "christmas tree", "gift"]
+    },
+    {
+      "name": "New Year's Eve",
+      "name_vi": "Giao Thừa Tây",
+      "date": "2026-12-31",
+      "lead_days": 14,
+      "market": "Global",
+      "categories": ["party", "resolution", "fitness", "planner"],
+      "keywords": ["new year", "2027", "resolution", "party"]
+    },
+    {
+      "name": "New Year's Day",
+      "name_vi": "Tết Dương Lịch",
+      "date": "2027-01-01",
+      "lead_days": 14,
+      "market": "Global",
+      "categories": ["resolution", "planner", "fitness", "motivation"],
+      "keywords": ["new year 2027", "resolution", "planner", "goal"]
+    },
+    {
+      "name": "Valentine's Day",
+      "name_vi": "Lễ Tình Nhân",
+      "date": "2027-02-14",
+      "lead_days": 30,
+      "market": "Global",
+      "categories": ["jewelry", "necklace", "couple", "heart", "romantic", "love"],
+      "keywords": ["valentine", "love", "couple gift", "heart necklace", "romantic gift", "boyfriend girlfriend"]
+    },
+    {
+      "name": "International Women's Day",
+      "name_vi": "Quốc Tế Phụ Nữ 8/3",
+      "date": "2027-03-08",
+      "lead_days": 21,
+      "market": "Global",
+      "categories": ["jewelry", "flowers", "empowerment"],
+      "keywords": ["women day", "8 march", "feminist gift", "empowerment"]
+    },
+    {
+      "name": "St. Patrick's Day",
+      "name_vi": "Lễ Thánh Patrick (Mỹ/Ireland)",
+      "date": "2027-03-17",
+      "lead_days": 21,
+      "market": "US",
+      "categories": ["green", "irish", "shamrock", "lucky", "clover"],
+      "keywords": ["st patrick", "shamrock", "irish", "lucky", "clover", "green"]
+    },
+    {
+      "name": "Easter",
+      "name_vi": "Lễ Phục Sinh",
+      "date": "2027-03-28",
+      "lead_days": 30,
+      "market": "Global",
+      "categories": ["bunny", "egg", "spring", "pastel", "kids"],
+      "keywords": ["easter", "bunny", "egg", "spring", "pastel"]
+    },
+    {
+      "name": "Mother's Day",
+      "name_vi": "Ngày của Mẹ (Mỹ) 2027",
+      "date": "2027-05-09",
+      "lead_days": 30,
+      "market": "US",
+      "categories": ["jewelry", "mug", "photo frame", "flowers", "handmade card"],
+      "keywords": ["mom gift", "mother day", "best mom", "mama"]
+    },
+    {
+      "name": "Graduation Season Peak",
+      "name_vi": "Mùa Tốt Nghiệp (đỉnh) 2027",
+      "date": "2027-05-15",
+      "lead_days": 45,
+      "market": "US",
+      "categories": ["graduation gift", "grad cap", "college", "class of 2027"],
+      "keywords": ["graduation gift", "class of 2027", "grad gift", "college graduation", "senior gift"]
+    },
+    {
+      "name": "Summer Wedding Peak",
+      "name_vi": "Mùa Cưới Hè (đỉnh) 2027",
+      "date": "2027-06-15",
+      "lead_days": 75,
+      "market": "US",
+      "categories": ["wedding", "bridesmaid", "bridal shower", "wedding favor"],
+      "keywords": ["bridesmaid gift", "bridal shower", "wedding favor", "mr mrs sign", "wedding guest book", "bachelorette"]
+    },
+    {
+      "name": "Father's Day",
+      "name_vi": "Ngày của Cha (Mỹ) 2027",
+      "date": "2027-06-20",
+      "lead_days": 30,
+      "market": "US",
+      "categories": ["tools", "whiskey glass", "dad mug", "leather", "bbq"],
+      "keywords": ["dad gift", "father day", "best dad", "papa"]
+    }
+  ]
+}

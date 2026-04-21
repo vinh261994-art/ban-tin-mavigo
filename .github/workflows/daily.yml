@@ -1,0 +1,64 @@
+# ==========================================================
+#  BẢN TIN MAVIGO — DAILY BRIEF
+# ==========================================================
+#  Chạy 8h sáng VN mỗi ngày (= 01:00 UTC). Scrape shop,
+#  check keyword trend, render bản tin, gửi Telegram.
+#
+#  YÊU CẦU SECRETS (Settings → Secrets → Actions):
+#    TELEGRAM_BOT_TOKEN — token từ @BotFather
+#    TELEGRAM_CHAT_ID   — chat ID (âm nếu là group, dương nếu 1:1)
+#
+#  Không cần GEMINI_API_KEY cho daily (chỉ weekly dùng).
+#
+#  MANUAL TEST: vào tab Actions → "Daily Brief" → Run workflow
+#  Repo cần PERMISSIONS: Settings → Actions → General →
+#    Workflow permissions = "Read and write permissions"
+#    (để auto-commit state về data/*.json)
+# ==========================================================
+
+name: Daily Brief
+
+on:
+  schedule:
+    # 01:00 UTC = 08:00 VN (UTC+7)
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}   # enable manual trigger
+
+concurrency:
+  group: mavigo-daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write     # needed for git-auto-commit
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run daily report
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONIOENCODING: utf-8
+        run: python scripts/daily_report.py
+
+      - name: Commit updated state files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(data): update daily state [skip ci]"
+          file_pattern: "data/*.json"
+          commit_user_name: "mavigo-bot"
+          commit_user_email: "mavigo-bot@users.noreply.github.com"

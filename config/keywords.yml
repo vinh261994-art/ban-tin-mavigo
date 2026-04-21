@@ -1,0 +1,46 @@
+# ==========================================================
+#  KEYWORD THEO DÕI TREND
+# ==========================================================
+#
+# Script sẽ gọi YTrends (ytrends_research_keyword) cho từng
+# keyword trong list dưới đây, phát hiện:
+#   - Keyword đang tăng đột biến (momentum score cao)
+#   - Cơ hội mới ít cạnh tranh (opportunity score cao)
+#   - Keyword đang chết (momentum giảm)
+#
+# HƯỚNG DẪN ĐIỀN:
+#   - Mỗi keyword 1 dòng, tiếng Anh (ngôn ngữ của Etsy)
+#   - Có thể thêm/xoá bất cứ lúc nào
+#   - Tốt nhất 10-30 keyword → quá nhiều sẽ chạm rate limit
+#   - Cụ thể hóa: "linen apron" tốt hơn "apron"
+#   - Gợi ý đặt: 5-10 keyword niche bạn đang bán + 5-10 keyword muốn khám phá
+#
+# ==========================================================
+keywords:
+  # ─── ĐIỀN KEYWORD Ở DƯỚI ĐÂY ────────────────────────────
+
+  # Ví dụ để tham khảo (xoá nếu không dùng):
+  - "linen apron"
+  - "birthday candle holder"
+  - "custom dog portrait"
+
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # - ""
+  # ─── HẾT KHU VỰC KEYWORD ───────────────────────────────

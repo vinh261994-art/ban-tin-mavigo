@@ -1,0 +1,217 @@
+"""Scrape public shop pages (Etsy + eBay) to track daily sales deltas.
+
+Etsy: https://www.etsy.com/shop/<NAME>         → "X Sales" in header
+eBay: https://www.ebay.com/str/<NAME>          → "N items sold" in embedded JSON
+      https://www.ebay.com/usr/<NAME>          → same pattern, user profile variant
+
+Output: data/sales_history.json (appended per day).
+"""
+from __future__ import annotations
+
+import json
+import random
+import re
+import sys
+import time
+
+# Windows cp1252 console can't print unicode; force UTF-8 when attached to a terminal
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+
+import httpx
+import yaml
+
+ROOT = Path(__file__).resolve().parent.parent
+SHOPS_FILE = ROOT / "config" / "shops.yml"
+HISTORY_FILE = ROOT / "data" / "sales_history.json"
+
+# Rotating UAs — real Chrome versions, kept short to avoid detection heuristics
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+]
+
+HEADERS_BASE = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+
+@dataclass
+class Snapshot:
+    date: str          # ISO date YYYY-MM-DD (UTC)
+    total_sales: int   # cumulative lifetime sales at time of scrape
+    delta: Optional[int] = None   # vs previous snapshot; None on first run or parse fail
+    error: Optional[str] = None   # set if scrape/parse failed this run
+
+
+def _fetch(url: str, timeout: float = 25.0) -> str:
+    headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
+    with httpx.Client(timeout=timeout, follow_redirects=True, headers=headers) as client:
+        r = client.get(url)
+        r.raise_for_status()
+        return r.text
+
+
+# ---------- Etsy parsers ----------
+
+ETSY_SALES_PATTERNS = [
+    # Common Etsy header markup — "X,XXX Sales" or "X Sale"
+    re.compile(r'>\s*([\d,]+)\s*Sales?\s*<', re.IGNORECASE),
+    # JSON embed (less stable key name — Etsy swaps these occasionally)
+    re.compile(r'"transaction_sold_count"\s*:\s*(\d+)'),
+    re.compile(r'"num_sold"\s*:\s*(\d+)'),
+]
+
+
+def parse_etsy_sales(html: str) -> Optional[int]:
+    for pat in ETSY_SALES_PATTERNS:
+        m = pat.search(html)
+        if m:
+            return int(m.group(1).replace(",", ""))
+    return None
+
+
+# ---------- eBay parsers ----------
+
+# Confirmed from stephanie9121 page: PRESENCE_INFORMATION_MODULE has a TextSpan
+# with the bold number immediately followed by a span " items sold"
+EBAY_SOLD_PATTERN = re.compile(
+    r'"text"\s*:\s*"([\d,]+)"\s*,\s*"styles"\s*:\s*\["BOLD"\]\s*\}\s*,\s*'
+    r'\{\s*"_type"\s*:\s*"TextSpan"\s*,\s*"text"\s*:\s*"\s*items sold"'
+)
+# Fallback — simpler text proximity search
+EBAY_SOLD_PATTERN_FALLBACK = re.compile(r'([\d,]+)\s*items sold', re.IGNORECASE)
+
+
+def parse_ebay_sales(html: str) -> Optional[int]:
+    m = EBAY_SOLD_PATTERN.search(html)
+    if m:
+        return int(m.group(1).replace(",", ""))
+    # Fallback (risk: may catch unrelated "items sold" in footer scripts)
+    m = EBAY_SOLD_PATTERN_FALLBACK.search(html)
+    if m:
+        return int(m.group(1).replace(",", ""))
+    return None
+
+
+# ---------- Shop tracking flow ----------
+
+def scrape_shop(platform: str, url: str) -> tuple[Optional[int], Optional[str]]:
+    """Returns (total_sales, error_msg). One of them is None."""
+    try:
+        html = _fetch(url)
+    except httpx.HTTPStatusError as e:
+        return None, f"HTTP {e.response.status_code}"
+    except httpx.TransportError as e:
+        return None, f"network: {type(e).__name__}"
+
+    if platform == "etsy":
+        total = parse_etsy_sales(html)
+    elif platform == "ebay":
+        total = parse_ebay_sales(html)
+    else:
+        return None, f"unknown platform: {platform}"
+
+    if total is None:
+        return None, "parse failed (selector may have changed)"
+    return total, None
+
+
+def load_history() -> dict:
+    if not HISTORY_FILE.exists():
+        return {"last_updated": None, "shops": {}}
+    with HISTORY_FILE.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_history(history: dict) -> None:
+    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_FILE.open("w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+
+
+def load_shops() -> list[dict]:
+    if not SHOPS_FILE.exists():
+        raise FileNotFoundError(f"Missing {SHOPS_FILE}")
+    with SHOPS_FILE.open(encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    shops = []
+    for platform in ("etsy", "ebay"):
+        for entry in data.get(platform) or []:
+            if not entry or "url" not in entry:
+                continue
+            shops.append({
+                "name": entry.get("name") or entry["url"].rsplit("/", 1)[-1],
+                "url": entry["url"],
+                "platform": platform,
+            })
+    return shops
+
+
+def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    shops = load_shops()
+    history = load_history()
+    shop_map = history.setdefault("shops", {})
+
+    print(f"[shop_tracker] {today} · scraping {len(shops)} shops")
+
+    for i, shop in enumerate(shops, 1):
+        key = shop["name"]
+        total, err = scrape_shop(shop["platform"], shop["url"])
+
+        entry = shop_map.setdefault(key, {
+            "platform": shop["platform"],
+            "url": shop["url"],
+            "snapshots": [],
+        })
+        # Keep url/platform fresh if user edited shops.yml
+        entry["platform"] = shop["platform"]
+        entry["url"] = shop["url"]
+
+        snaps = entry["snapshots"]
+        prev = snaps[-1] if snaps else None
+
+        if err:
+            snap = Snapshot(date=today, total_sales=prev["total_sales"] if prev else 0,
+                            delta=None, error=err)
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} ⚠ {err}")
+        else:
+            delta = None
+            if prev and prev.get("total_sales") is not None and not prev.get("error"):
+                delta = total - prev["total_sales"]
+            snap = Snapshot(date=today, total_sales=total, delta=delta)
+            marker = "✓" if delta is None else f"Δ{delta:+d}"
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} {marker} (total={total})")
+
+        # If we already wrote a snapshot for `today`, overwrite (idempotent same-day runs)
+        if snaps and snaps[-1]["date"] == today:
+            snaps[-1] = asdict(snap)
+        else:
+            snaps.append(asdict(snap))
+
+        # Random polite delay (skip after last)
+        if i < len(shops):
+            time.sleep(random.uniform(*delay_range))
+
+    history["last_updated"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    save_history(history)
+    return history
+
+
+if __name__ == "__main__":
+    # Allow smoke-test with `python shop_tracker.py --test` (shorter delay)
+    delays = (0.5, 1.5) if "--test" in sys.argv else (3.0, 6.0)
+    run(delay_range=delays)

@@ -1,0 +1,99 @@
+# ==========================================================
+#  DANH SÁCH SHOP CẦN THEO DÕI SALE HÀNG NGÀY
+# ==========================================================
+#
+# HƯỚNG DẪN ĐIỀN:
+#   - Chỉ cần URL công khai, không cần đăng nhập
+#   - Etsy:  https://www.etsy.com/shop/<TEN_SHOP>
+#   - eBay:  https://www.ebay.com/str/<TEN>   (store)
+#            hoặc https://www.ebay.com/usr/<TEN>  (user profile)
+#   - `name` chỉ để hiển thị trong bản tin, đặt gì cũng được
+#   - Thêm/xóa shop thoải mái, script tự đọc lại mỗi lần chạy
+#   - Shop mới sẽ chưa có delta lần đầu (cần 1 ngày baseline)
+#   - Xóa shop khỏi đây: data cũ vẫn giữ trong sales_history.json
+#
+# ==========================================================
+#  ETSY SHOP  (mục tiêu: 15 shop)
+# ==========================================================
+etsy:
+  # ─── ĐIỀN SHOP ETSY Ở DƯỚI ĐÂY ──────────────────────────
+  - name: "GoVinh"
+    url:  "https://www.etsy.com/shop/GoVinh"
+
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # - name: ""
+  #   url:  "https://www.etsy.com/shop/"
+  # ─── HẾT KHU VỰC ETSY ──────────────────────────────────
+
+# ==========================================================
+#  EBAY SHOP  (mục tiêu: 20 shop)
+# ==========================================================
+ebay:
+  # ─── ĐIỀN SHOP EBAY Ở DƯỚI ĐÂY ──────────────────────────
+  - name: "stephanie9121"
+    url:  "https://www.ebay.com/str/stephanie9121"
+
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # - name: ""
+  #   url:  "https://www.ebay.com/str/"
+  # ─── HẾT KHU VỰC EBAY ──────────────────────────────────

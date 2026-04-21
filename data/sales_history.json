@@ -1,0 +1,29 @@
+{
+  "last_updated": "2026-04-21T16:04:35+00:00",
+  "shops": {
+    "GoVinh": {
+      "platform": "etsy",
+      "url": "https://www.etsy.com/shop/GoVinh",
+      "snapshots": [
+        {
+          "date": "2026-04-21",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
+        }
+      ]
+    },
+    "stephanie9121": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/str/stephanie9121",
+      "snapshots": [
+        {
+          "date": "2026-04-21",
+          "total_sales": 8,
+          "delta": 0,
+          "error": null
+        }
+      ]
+    }
+  }
+}

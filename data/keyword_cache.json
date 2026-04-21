@@ -1,0 +1,56 @@
+{
+  "linen apron": {
+    "cached_at": "2026-04-21T16:02:36+00:00",
+    "report": {
+      "keyword": "linen apron",
+      "bucket": "stable",
+      "opportunity_score": 48.9,
+      "competition": "low",
+      "action": "competitive",
+      "trend": "rising",
+      "trend_strength": 0.1108,
+      "revenue_change_pct": 0.36,
+      "price_range": "38-78.32",
+      "total_listings": 78,
+      "demand_supply_ratio": 0.14,
+      "error": "",
+      "action_reason_en": "Decent market but crowded — need strong differentiation"
+    }
+  },
+  "birthday candle holder": {
+    "cached_at": "2026-04-21T16:02:43+00:00",
+    "report": {
+      "keyword": "birthday candle holder",
+      "bucket": "stable",
+      "opportunity_score": 100.0,
+      "competition": "low",
+      "action": "insufficient_data",
+      "trend": "?",
+      "trend_strength": 0.0,
+      "revenue_change_pct": 0.0,
+      "price_range": "nan-nan",
+      "total_listings": 0,
+      "demand_supply_ratio": 0.0,
+      "error": "",
+      "action_reason_en": "Not enough listings to evaluate — check back later"
+    }
+  },
+  "custom dog portrait": {
+    "cached_at": "2026-04-21T16:02:47+00:00",
+    "report": {
+      "keyword": "custom dog portrait",
+      "bucket": "spike",
+      "opportunity_score": 47.9,
+      "competition": "medium",
+      "action": "competitive",
+      "trend": "rising",
+      "trend_strength": 0.9642,
+      "revenue_change_pct": 2.24,
+      "price_range": "16.5-40",
+      "total_listings": 462,
+      "demand_supply_ratio": 0.15,
+      "error": "",
+      "action_reason_en": "Decent market but crowded — need strong differentiation"
+    }
+  }
+}

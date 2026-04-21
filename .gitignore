@@ -1,0 +1,26 @@
+# Python venv + cache
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Secrets
+.env
+.env.local
+
+# Claude Code local overrides (allow-list, personal prefs)
+.claude/settings.local.json
+.mcp.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NOTE: data/*.json is tracked — GitHub Actions commits them so state
+# (sales_history, keyword_cache, ytrends_calendar_cache) persists across runs.
