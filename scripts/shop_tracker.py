@@ -9,6 +9,7 @@ Output: data/sales_history.json (appended per day).
 from __future__ import annotations
 
 import json
+import os
 import random
 import re
 import sys
@@ -24,6 +25,8 @@ from typing import Optional
 
 import httpx
 import yaml
+
+import sheet_loader
 
 ROOT = Path(__file__).resolve().parent.parent
 SHOPS_FILE = ROOT / "config" / "shops.yml"
@@ -142,7 +145,7 @@ def save_history(history: dict) -> None:
         json.dump(history, f, ensure_ascii=False, indent=2)
 
 
-def load_shops() -> list[dict]:
+def _load_shops_from_yaml() -> list[dict]:
     if not SHOPS_FILE.exists():
         raise FileNotFoundError(f"Missing {SHOPS_FILE}")
     with SHOPS_FILE.open(encoding="utf-8") as f:
@@ -158,6 +161,21 @@ def load_shops() -> list[dict]:
                 "platform": platform,
             })
     return shops
+
+
+def load_shops() -> list[dict]:
+    """Load shop list. Prefer Google Sheet if SHOPS_SHEET_URL is set, else YAML."""
+    sheet_url = (os.environ.get("SHOPS_SHEET_URL") or "").strip()
+    if sheet_url:
+        try:
+            shops = sheet_loader.load_shops(sheet_url)
+            if shops:
+                return shops
+            print("[shop_tracker] Sheet trả về 0 shop — fallback shops.yml")
+        except Exception as e:
+            print(f"[shop_tracker] Sheet load failed ({type(e).__name__}: {e}) "
+                  f"— fallback shops.yml")
+    return _load_shops_from_yaml()
 
 
 def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
