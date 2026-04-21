@@ -1,17 +1,21 @@
 """Weekly deep report — Monday 9am VN.
 
-Combines:
-  1. 7-day per-shop sales totals from data/sales_history.json
-  2. Tracked-keyword state (keyword_tracker run, bucket distribution)
-  3. YTrends find_trending_keywords — discover rising niches
-  4. YTrends find_hidden_gems — low-competition opportunities
-  5. Upcoming events in next 90 days
-  6. Gemini narrative synthesis (1-2 sarcastic paragraphs)
+Produces a multi-part Telegram delivery:
+  1. Text bulletin with 6 sections:
+       - MACRO (market_snapshot)
+       - HOT TODAY (find_hot_listings — summary only)
+       - TRENDING ∩ GEMS (intersection)
+       - CLUSTERS (token-matched themes)
+       - SEASONAL PICKS (explore_niche per upcoming event — summary)
+       - WEEKLY SHOP SALES + KEYWORDS TRACKED + GEMINI NARRATIVE
+  2. Media group of top-3 hot listings.
+  3. Media group per upcoming event (≤ 60d, status on_time/late) showing top-3 listings.
 
 Honors DRY_RUN=1 to skip Telegram + Gemini API calls.
 """
 from __future__ import annotations
 
+import html
 import json
 import random
 import sys
@@ -24,13 +28,14 @@ if hasattr(sys.stdout, "reconfigure"):
 import holiday_advisor
 import keyword_tracker
 import telegram_sender
+import ytrends_analytics as yta
 from gemini_client import GeminiError, generate as gemini_generate
-from ytrends_client import YTrendsClient, extract_structured
 
 ROOT = Path(__file__).resolve().parent.parent
 HISTORY_FILE = ROOT / "data" / "sales_history.json"
 
-LOOKAHEAD_DAYS = 90
+LOOKAHEAD_DAYS = 60
+MAX_SEASONAL_EVENTS = 3   # how many upcoming events get a deep dive
 
 
 # ==========================================================
@@ -38,34 +43,24 @@ LOOKAHEAD_DAYS = 90
 # ==========================================================
 
 WEEK_ZERO_LINES = [
-    "Cả tuần tròn zero, chắc ai cũng nghĩ shop đã đóng cửa.",
-    "7 ngày liền không một đơn — shop này định để cho nhện giăng tơ à?",
+    "Cả tuần tròn zero — shop đã thành nghĩa địa rồi à?",
+    "7 ngày liền không một đơn, chắc ai cũng tưởng shop đã đóng cửa.",
     "Tuần qua im lìm như ban đêm ở nghĩa trang — bán cho ai?",
 ]
 
 WEEK_LOW_LINES = [
-    "Cả tuần được {n} đơn — chia ra 1 ngày 1 đơn cũng không đủ, thôi chuyển nghề giao hàng đi ông bà.",
-    "{n} đơn/7 ngày — số đó khỏi nói ra, sợ hàng xóm cười.",
+    "Cả tuần {n} đơn — chia ra 1 ngày 1 đơn chưa đủ, thôi chuyển nghề giao hàng đi.",
+    "{n} đơn/7 ngày — số đó đừng nói ra, hàng xóm cười cho.",
 ]
 
 WEEK_OK_LINES = [
-    "{n} đơn tuần này — tạm ổn, nhưng đừng ngồi đó vuốt mèo, đối thủ không đợi mình.",
-    "Được {n} đơn — chưa đủ giàu, nhưng ít nhất chưa phải bán shop trả nợ.",
+    "{n} đơn tuần này — tạm ổn, nhưng đừng ngồi đó vuốt mèo, đối thủ không đợi.",
+    "Được {n} đơn — chưa giàu, nhưng ít nhất chưa phải bán shop trả nợ.",
 ]
 
 WEEK_GREAT_LINES = [
-    "{n} đơn tuần — khá đấy! Mau nhập thêm inventory kẻo tuần sau cháy hàng không có bán.",
-    "Bùng nổ {n} đơn — giữ nhịp này đi, đừng lại tuần sau về mo.",
-]
-
-NO_TRENDING_LINES = [
-    "YTrends không trả về trending nào rõ ràng — chắc cả sàn đang ngủ đông.",
-    "Không có niche nào nổi bật tuần này — tranh thủ optimize listing cũ đi.",
-]
-
-NO_GEMS_LINES = [
-    "Không có gem nào lộ ra — sàn quá đông hoặc bạn đã biết hết rồi.",
-    "Chưa thấy gem ngon — hay thử mở rộng category search xem?",
+    "{n} đơn tuần — khá đấy! Nhập thêm inventory kẻo tuần sau cháy hàng.",
+    "Bùng nổ {n} đơn — giữ nhịp đi, đừng tuần sau về mo.",
 ]
 
 
@@ -84,7 +79,6 @@ def _load_history() -> dict:
 
 
 def _weekly_shop_totals(history: dict, days: int = 7) -> list[dict]:
-    """For each shop, sum deltas over the last `days` days (skip errors/None)."""
     today = datetime.now(timezone.utc).date()
     cutoff = today - timedelta(days=days)
     out = []
@@ -118,43 +112,46 @@ def _weekly_shop_totals(history: dict, days: int = 7) -> list[dict]:
             "errors": errors,
             "total": latest_total,
         })
-    # Sort by weekly sales desc
     out.sort(key=lambda r: r["week_sales"], reverse=True)
     return out
 
 
-def _ytrends_list(tool: str, args: dict | None = None) -> list[dict]:
-    """Call a YTrends tool and try to extract a list of items from common shapes."""
-    try:
-        with YTrendsClient() as y:
-            res = y.call_tool(tool, args or {})
-            data = extract_structured(res) or {}
-    except Exception as e:
-        print(f"[weekly_report] {tool} failed: {type(e).__name__}: {e}")
-        return []
+# ==========================================================
+#  Format helpers
+# ==========================================================
 
-    # Try common list containers
-    list_keys = ("tags", "results", "items", "keywords", "listings",
-                 "trending", "gems", "niches")
-    if isinstance(data, list):
-        return [x for x in data if isinstance(x, dict)]
-    if isinstance(data, dict):
-        for key in list_keys:
-            v = data.get(key)
-            if isinstance(v, list) and v:
-                return [x for x in v if isinstance(x, dict)]
-        # Nested one level (e.g., {"data": {"tags": [...]}})
-        for outer in data.values():
-            if isinstance(outer, dict):
-                for key in list_keys:
-                    v = outer.get(key)
-                    if isinstance(v, list) and v:
-                        return [x for x in v if isinstance(x, dict)]
-    return []
+def _esc(s: object) -> str:
+    """HTML-escape untrusted external text for Telegram HTML mode. Unescapes
+    first so we don't double-encode API text that's already HTML-escaped."""
+    raw = html.unescape(str(s))
+    return (raw.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _esc_trim(s: object, n: int) -> str:
+    """Unescape → trim to N chars (clean text) → re-escape. Avoids cutting
+    mid-entity like `&#39;` which would get mangled to `&amp;#`."""
+    raw = html.unescape(str(s or ""))[:n]
+    return (raw.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _fmt_money(x) -> str:
+    try:
+        return f"${float(x):,.0f}"
+    except (TypeError, ValueError):
+        return "?"
+
+
+def _fmt_pct(x) -> str:
+    try:
+        return f"{float(x)*100:.1f}%"
+    except (TypeError, ValueError):
+        return "?"
 
 
 # ==========================================================
-#  Format sections
+#  Section formatters
 # ==========================================================
 
 def _format_header(today: datetime) -> str:
@@ -163,15 +160,133 @@ def _format_header(today: datetime) -> str:
     return f"📊 <b>BẢN TIN MAVIGO — TUẦN</b> ({start} → {end})"
 
 
+def _format_macro(snap: dict) -> str:
+    if not snap:
+        return "🌐 <b>BỐI CẢNH THỊ TRƯỜNG</b>\n  YTrends không trả về — bỏ qua."
+    lines = ["🌐 <b>BỐI CẢNH THỊ TRƯỜNG (US)</b>"]
+    if snap.get("total_listings"):
+        lines.append(f"▸ {snap['total_listings']:,} listings · "
+                     f"{snap.get('total_sellers', 0):,} sellers")
+    if snap.get("avg_price"):
+        lines.append(f"▸ Giá TB: {_fmt_money(snap['avg_price'])} · "
+                     f"median {_fmt_money(snap.get('median_price'))} · "
+                     f"sweet spot ${snap.get('price_p25','?')}-${snap.get('price_p75','?')}")
+    if snap.get("avg_conversion_rate") is not None:
+        lines.append(f"▸ Conversion TB: {_fmt_pct(snap['avg_conversion_rate'])} · "
+                     f"{snap.get('pct_new_sellers', 0)}% seller là 'new'")
+    if snap.get("recommended_action"):
+        lines.append(f"  💬 {_esc(snap['recommended_action'])}")
+    return "\n".join(lines)
+
+
+def _format_hot_summary(hot: list[dict]) -> str:
+    if not hot:
+        return "🔥 <b>HOT NGAY HÔM NAY</b>\n  YTrends im — chắc cả sàn đang chill."
+    lines = [f"🔥 <b>HOT NGAY HÔM NAY</b> — top {min(5, len(hot))} listing outperform peer"]
+    for i, h in enumerate(hot[:5], 1):
+        title = _esc_trim(h.get("title"), 60)
+        price = _fmt_money(h.get("price_usd") or h.get("price"))
+        conv_x = h.get("conversion_multiplier")
+        sales_x = h.get("sales_multiplier")
+        country = h.get("shop_country") or "?"
+        why = _esc_trim(h.get("why_hot_detail"), 120)
+        bits = [f"{price}", f"{country}"]
+        if conv_x:
+            try:
+                bits.append(f"conv {float(conv_x):.1f}x")
+            except (TypeError, ValueError):
+                pass
+        if sales_x:
+            try:
+                bits.append(f"sold {float(sales_x):.0f}x")
+            except (TypeError, ValueError):
+                pass
+        lines.append(f"{i}. <b>{title}…</b>")
+        lines.append(f"   · {' · '.join(bits)}")
+        if why:
+            lines.append(f"   · {why}")
+    lines.append("  📷 <i>xem ảnh album bên dưới</i>")
+    return "\n".join(lines)
+
+
+def _format_intersection(inter: list[dict]) -> str:
+    if not inter:
+        return ("🎯 <b>TRENDING ∩ HIDDEN GEMS</b>\n"
+                "  Tuần này trending và gems không giao nhau — không có signal đặc biệt.")
+    lines = [f"🎯 <b>TRENDING ∩ HIDDEN GEMS</b> — {len(inter)} keyword signal mạnh (vừa nổi vừa ít đối thủ)"]
+    for it in inter[:5]:
+        tag = _esc(it.get("tag", "?"))
+        m = it.get("momentum_score")
+        g = it.get("gem_score")
+        comp = it.get("competition_level", "?")
+        price = _fmt_money(it.get("avg_price"))
+        conv = _fmt_pct(it.get("avg_conversion_rate"))
+        try:
+            score_str = f"mom {float(m):.0f}/gem {float(g):.0f}"
+        except (TypeError, ValueError):
+            score_str = f"mom {m}/gem {g}"
+        lines.append(f"▸ <b>{tag}</b> · {score_str} · {comp} · {price} · conv {conv}")
+    return "\n".join(lines)
+
+
+def _format_clusters(clusters: list[dict]) -> str:
+    if not clusters:
+        return ""
+    # Keep only clusters size >= 3 to avoid noise
+    big = [c for c in clusters if c["size"] >= 3][:4]
+    if not big:
+        return ""
+    lines = ["🧩 <b>NHÓM THEME</b> — niche đang tập trung"]
+    for c in big:
+        tags = ", ".join(_esc(it.get("tag", "?")) for it in c["items"][:6])
+        lines.append(f"▸ <b>#{_esc(c['theme'])}</b> ({c['size']} kw): {tags}")
+    return "\n".join(lines)
+
+
+def _format_seasonal_summary(picks: list[dict]) -> str:
+    if not picks:
+        return ("📅 <b>HOT THEO DỊP LỄ</b>\n"
+                "  Không có dịp lễ nào trong lead time — xả hơi.")
+    lines = ["📅 <b>HOT THEO DỊP LỄ SẮP TỚI</b>"]
+    for p in picks:
+        ev = p["event"]
+        seed = p["seed"]
+        niche = p["niche"]
+        ov = niche.get("overview") or {}
+        top = niche.get("top_listings") or []
+        adj = niche.get("adjacent_tags") or []
+
+        status_emoji = {"late": "🟠", "on_time": "🟢", "upcoming": "🔵"}.get(ev.status, "•")
+        lines.append("")
+        lines.append(f"{status_emoji} <b>{_esc(ev.name_vi)}</b> — còn {ev.days_until} ngày "
+                     f"(seed: <code>{_esc(seed)}</code>)")
+        if ov.get("listings") and ov.get("avg_price_usd"):
+            lines.append(f"   📊 {ov.get('listings', 0):,} listings · "
+                         f"giá TB {_fmt_money(ov.get('avg_price_usd'))} · "
+                         f"conv {_fmt_pct(ov.get('avg_conversion_rate'))}")
+        # Top 3 listings brief
+        for i, t in enumerate(top[:3], 1):
+            title = _esc_trim(t.get("title"), 50)
+            price = _fmt_money(t.get("price_usd"))
+            conv = _fmt_pct(t.get("conversion_rate"))
+            verdict = t.get("listing_verdict") or ""
+            lines.append(f"   {i}. <b>{title}…</b> · {price} · conv {conv} · {_esc(verdict)}")
+        # Top adjacent tags (MUST_USE)
+        must = [a for a in adj if "MUST" in (a.get("action_reason") or "").upper()][:3]
+        if must:
+            tag_names = ", ".join(_esc(a.get("tag", "?")) for a in must)
+            lines.append(f"   💡 Tag phải dùng: {tag_names}")
+        lines.append(f"   📷 <i>xem album ảnh bên dưới</i>")
+    return "\n".join(lines)
+
+
 def _format_shop_week(totals: list[dict]) -> str:
     if not totals:
         return ("💰 <b>SALE TUẦN QUA</b>\n"
-                "  Chưa có shop nào trong history — có khi scrape toàn lỗi, hoặc bạn chưa điền URL.")
-
+                "  Chưa có shop nào trong history.")
     week_total = sum(t["week_sales"] for t in totals)
     lines = [f"💰 <b>SALE TUẦN QUA</b> ({len(totals)} shop)"]
     lines.append(f"▸ Tổng 7 ngày: <b>{week_total}</b> đơn")
-
     if week_total == 0:
         snark = _pick(WEEK_ZERO_LINES)
     elif week_total <= 7:
@@ -182,206 +297,235 @@ def _format_shop_week(totals: list[dict]) -> str:
         snark = _pick(WEEK_GREAT_LINES, n=week_total)
     lines.append(f"  💬 {snark}")
 
-    # Top 5 shops
     top = [t for t in totals if t["week_sales"] > 0][:5]
     if top:
-        lines.append("▸ Top 5 shop tuần:")
+        lines.append("▸ Top shop tuần:")
         for t in top:
-            lines.append(f"    • <b>{t['name']}</b> ({t['platform']})  "
-                         f"<b>+{t['week_sales']}</b> đơn  (total {t['total']})")
-
-    # Dead weight — shops with 0 weekly sales AND enough data to judge
+            lines.append(f"    • <b>{_esc(t['name'])}</b> ({t['platform']})  "
+                         f"<b>+{t['week_sales']}</b> đơn")
     dead = [t for t in totals if t["week_sales"] == 0 and t["days_with_data"] >= 3]
     if dead:
-        names = ", ".join(t["name"] for t in dead[:5])
-        more = f" +{len(dead)-5} shop khác" if len(dead) > 5 else ""
-        lines.append(f"▸ ☠️ Bán 0 đơn cả tuần: {names}{more}")
-
-    # Scrape-broken shops
+        names = ", ".join(_esc(t["name"]) for t in dead[:5])
+        lines.append(f"▸ ☠️ Bán 0 đơn: {names}")
     broken = [t for t in totals if t["days_with_data"] == 0 and t["errors"] > 0]
     if broken:
-        names = ", ".join(t["name"] for t in broken[:5])
-        lines.append(f"▸ ❌ Scrape fail cả tuần: {names} — check URL/IP blocking")
-
+        names = ", ".join(_esc(t["name"]) for t in broken[:5])
+        lines.append(f"▸ ❌ Scrape fail: {names}")
     return "\n".join(lines)
 
 
 def _format_keywords_tracked(reports: list) -> str:
     if not reports:
-        return ("🔍 <b>KEYWORD THEO DÕI</b>\n"
-                "  Chưa có keyword nào trong config/keywords.yml.")
-
+        return ""
     buckets: dict[str, list] = {}
     for r in reports:
         buckets.setdefault(r.bucket, []).append(r)
-
-    lines = [f"🔍 <b>KEYWORD THEO DÕI</b> ({len(reports)} keyword)"]
+    lines = [f"🔍 <b>KEYWORD THEO DÕI</b> ({len(reports)} kw)"]
     for name, emoji in [("spike", "🚀"), ("opportunity", "✨"),
                         ("dying", "💀"), ("crowded", "🏟️"),
                         ("stable", "😐"), ("no_data", "❓"), ("error", "❌")]:
         items = buckets.get(name, [])
         if not items:
             continue
-        kws = ", ".join(r.keyword for r in items[:8])
+        kws = ", ".join(_esc(r.keyword) for r in items[:8])
         lines.append(f"▸ {emoji} {name} ({len(items)}): {kws}")
     return "\n".join(lines)
 
 
-def _format_trending(items: list[dict]) -> str:
-    if not items:
-        return f"🌟 <b>NICHE RISING (YTrends)</b>\n  {_pick(NO_TRENDING_LINES)}"
-    lines = [f"🌟 <b>NICHE RISING (YTrends)</b> — top {min(5, len(items))} keyword đang nổi"]
-    for it in items[:5]:
-        # Try common key names for keyword + score
-        kw = (it.get("keyword") or it.get("tag") or it.get("name")
-              or it.get("niche") or "?")
-        score = (it.get("momentum") or it.get("momentum_score")
-                 or it.get("trend_strength") or it.get("opportunity_score") or "")
-        bits = [f"<b>{kw}</b>"]
-        if score != "":
-            try:
-                bits.append(f"score {float(score):.1f}")
-            except (TypeError, ValueError):
-                bits.append(f"score {score}")
-        action = it.get("recommended_action") or it.get("action")
-        if action:
-            bits.append(f"action: {action}")
-        lines.append(f"    • " + "  ·  ".join(bits))
-    return "\n".join(lines)
-
-
-def _format_gems(items: list[dict]) -> str:
-    if not items:
-        return f"💎 <b>HIDDEN GEMS (YTrends)</b>\n  {_pick(NO_GEMS_LINES)}"
-    lines = [f"💎 <b>HIDDEN GEMS (YTrends)</b> — top {min(3, len(items))} cơ hội ít cạnh tranh"]
-    for it in items[:3]:
-        kw = (it.get("keyword") or it.get("tag") or it.get("name") or "?")
-        gem_score = (it.get("gem_score") or it.get("opportunity_score") or "")
-        comp = it.get("competition_level") or it.get("competition") or ""
-        bits = [f"<b>{kw}</b>"]
-        if gem_score != "":
-            try:
-                bits.append(f"gem {float(gem_score):.1f}")
-            except (TypeError, ValueError):
-                bits.append(f"gem {gem_score}")
-        if comp:
-            bits.append(f"comp: {comp}")
-        lines.append(f"    • " + "  ·  ".join(bits))
-    return "\n".join(lines)
-
-
-def _format_holidays(events: list) -> str:
-    if not events:
-        return "🎃 <b>DỊP LỄ / MÙA 90 NGÀY TỚI</b>\n  Không có gì — xả hơi."
-    lines = [f"🎃 <b>DỊP LỄ / MÙA 90 NGÀY TỚI</b> ({len(events)} sự kiện)"]
-    for e in events[:8]:
-        status_emoji = {"late": "🟠", "on_time": "🟢", "upcoming": "🔵"}.get(e.status, "•")
-        lines.append(f"    {status_emoji} <b>{e.name_vi}</b> — {e.date} (còn {e.days_until} ngày)")
-    if len(events) > 8:
-        lines.append(f"    … +{len(events)-8} sự kiện khác")
-    return "\n".join(lines)
-
-
 # ==========================================================
-#  Gemini narrative
+#  Gemini narrative (with rich context)
 # ==========================================================
 
-def _build_gemini_prompt(totals: list[dict],
-                        kw_reports: list,
-                        trending: list[dict],
-                        gems: list[dict],
-                        events: list) -> str:
-    """Compact factual brief for Gemini to roast."""
+def _build_gemini_prompt(snap: dict, hot: list[dict], inter: list[dict],
+                        picks: list[dict], totals: list[dict],
+                        kw_reports: list) -> str:
     week_total = sum(t["week_sales"] for t in totals)
     top_shop = next((t for t in totals if t["week_sales"] > 0), None)
     dead_shops = [t for t in totals if t["week_sales"] == 0 and t["days_with_data"] >= 3]
 
-    spike_kws = [r.keyword for r in kw_reports if r.bucket == "spike"]
-    opp_kws = [r.keyword for r in kw_reports if r.bucket == "opportunity"]
-    dying_kws = [r.keyword for r in kw_reports if r.bucket == "dying"]
+    # Extract 3 hottest product titles for narrative grounding
+    hot_titles = []
+    for h in hot[:3]:
+        t = (h.get("title") or "")[:60]
+        p = h.get("price_usd") or h.get("price")
+        if t and p:
+            hot_titles.append(f"{t} (${p})")
 
-    top_trending = [it.get("keyword") or it.get("tag") or it.get("name")
-                    for it in (trending or [])][:3]
-    top_gem = None
-    if gems:
-        g = gems[0]
-        top_gem = g.get("keyword") or g.get("tag") or g.get("name")
-
-    nearest_event = events[0] if events else None
+    inter_tags = [it.get("tag") for it in inter[:3]]
 
     lines = [
-        f"Số liệu tuần qua ({len(totals)} shop):",
-        f"- Tổng đơn 7 ngày: {week_total}",
-        f"- Shop dẫn đầu: {top_shop['name'] if top_shop else 'không có ai'} "
-        f"({top_shop['week_sales'] if top_shop else 0} đơn)",
-        f"- Số shop bán 0 đơn cả tuần: {len(dead_shops)}"
-        + (f" (ví dụ: {', '.join(t['name'] for t in dead_shops[:3])})" if dead_shops else ""),
-        f"- Keyword spike: {', '.join(spike_kws) or 'không có'}",
-        f"- Keyword opportunity: {', '.join(opp_kws) or 'không có'}",
-        f"- Keyword đang chết: {', '.join(dying_kws) or 'không có'}",
-        f"- Trending niches YTrends gợi ý: {', '.join(str(x) for x in top_trending) or 'không'}",
-        f"- Hidden gem YTrends: {top_gem or 'không có'}",
+        f"MACRO US: {snap.get('total_listings', '?')} listings, "
+        f"giá TB ${snap.get('avg_price', '?')}, conv TB {_fmt_pct(snap.get('avg_conversion_rate'))}",
+        f"TOP HOT LISTING: {' | '.join(hot_titles) or 'không có'}",
+        f"SIGNAL MẠNH (trending ∩ gems): {', '.join(inter_tags) or 'không'}",
+        f"DỊP LỄ TỚI: " + (
+            ", ".join(f"{p['event'].name_vi} ({p['event'].days_until}d, seed '{p['seed']}')"
+                     for p in picks) or "không có"),
+        f"SHOP TUẦN: {week_total} đơn tổng, top {top_shop['name'] if top_shop else 'không có'}, "
+        f"dead {len(dead_shops)} shop",
     ]
-    if nearest_event:
-        lines.append(f"- Dịp lễ/mùa gần nhất: {nearest_event.name_vi} còn {nearest_event.days_until} ngày ({nearest_event.status})")
+
+    spike_kws = [r.keyword for r in kw_reports if r.bucket == "spike"]
+    opp_kws = [r.keyword for r in kw_reports if r.bucket == "opportunity"]
+    if spike_kws or opp_kws:
+        lines.append(f"KEYWORD SPIKE/OPP: {', '.join(spike_kws + opp_kws)}")
 
     lines.append("")
-    lines.append("Hãy viết 1-2 đoạn văn xuôi ngắn (tổng 4-7 câu) tóm tắt tình hình và "
-                 "cho lời khuyên cụ thể tuần tới, giọng đanh đá mỉa mai như hướng dẫn. "
-                 "Không dùng bullet, không dùng markdown, không lặp lại số liệu thô.")
+    lines.append(
+        "Viết 2 đoạn văn xuôi ngắn (tổng 5-7 câu) tổng kết tuần này cho seller "
+        "Etsy/eBay Việt Nam. Giọng đanh đá, mỉa mai có mục đích — chê đúng chỗ "
+        "đáng chê, chỉ rõ hướng đi đáng bắt. Đoạn 1: tình hình (macro + shop). "
+        "Đoạn 2: gợi ý cụ thể tuần tới dựa trên signal + dịp lễ. "
+        "Không dùng bullet, không markdown, không lặp lại số thô."
+    )
     return "\n".join(lines)
 
 
-def _generate_narrative(totals, kw_reports, trending, gems, events) -> str:
-    prompt = _build_gemini_prompt(totals, kw_reports, trending, gems, events)
+def _generate_narrative(snap, hot, inter, picks, totals, kw_reports) -> str:
+    prompt = _build_gemini_prompt(snap, hot, inter, picks, totals, kw_reports)
     try:
-        text = gemini_generate(prompt, max_tokens=512, temperature=0.95)
+        text = gemini_generate(prompt, max_tokens=600, temperature=0.95)
     except GeminiError as e:
-        print(f"[weekly_report] Gemini failed ({e}) — falling back to template")
-        text = ("Tuần qua mình xem xong không biết nên cười hay nên khóc. "
-                "Shop thì đứng im, keyword thì trôi theo dòng nước — không ai chủ động vớt. "
-                "Tuần tới làm ơn đừng ngồi chờ phép màu, vào optimize listing và "
-                "bắn ad cho mấy keyword spike đi, đừng để đối thủ ăn hết.")
+        print(f"[weekly_report] Gemini failed ({e}) — using fallback")
+        text = ("Tuần qua shop thì đứng im, keyword thì trôi theo dòng nước — "
+                "không ai chủ động vớt. Signal tuần này rõ ràng ở mấy niche "
+                "personalized + seasonal, vấn đề là bạn có đủ nhanh để list không. "
+                "Tuần tới làm ơn đừng ngồi chờ phép màu — vào optimize listing "
+                "và bắn ad cho keyword đang spike, kẻo đối thủ ăn hết.")
     return f"🧠 <b>TỔNG KẾT TUẦN</b>\n{text}"
 
 
 # ==========================================================
-#  Build + send
+#  Media group builders
 # ==========================================================
 
-def build_report() -> str:
+def _hot_media_group(hot: list[dict]) -> list[dict]:
+    """Build media group for top hot listings with thumbnails."""
+    items = []
+    for h in hot[:5]:
+        url = h.get("image_url")
+        if not url:
+            continue
+        title = _esc((h.get("title") or "")[:80])
+        price = _fmt_money(h.get("price_usd") or h.get("price"))
+        conv_x = h.get("conversion_multiplier")
+        country = h.get("shop_country") or "?"
+        why = _esc((h.get("why_hot_detail") or "")[:150])
+        listing_id = h.get("listing_id")
+        link = f"https://www.etsy.com/listing/{listing_id}" if listing_id else ""
+
+        try:
+            conv_str = f"{float(conv_x):.1f}x conv"
+        except (TypeError, ValueError):
+            conv_str = ""
+
+        caption_lines = [
+            f"🔥 <b>{title}…</b>",
+            f"{price} · {country} · {conv_str}".strip(),
+        ]
+        if why:
+            caption_lines.append(f"💡 {why}")
+        if link:
+            caption_lines.append(f'<a href="{link}">Xem trên Etsy</a>')
+        caption = "\n".join(caption_lines)
+        items.append({"photo": url, "caption": caption})
+    return items
+
+
+def _seasonal_media_group(pick: dict) -> list[dict]:
+    """Build media group for one seasonal event's top listings."""
+    ev = pick["event"]
+    niche = pick["niche"]
+    top = niche.get("top_listings") or []
+    items = []
+    for t in top[:4]:
+        url = t.get("image_url")
+        if not url:
+            continue
+        title = _esc((t.get("title") or "")[:80])
+        price = _fmt_money(t.get("price_usd"))
+        conv = _fmt_pct(t.get("conversion_rate"))
+        verdict = _esc(t.get("listing_verdict") or "")
+        insights = _esc((t.get("competitive_insights") or "")[:200])
+        listing_id = t.get("listing_id")
+        link = f"https://www.etsy.com/listing/{listing_id}" if listing_id else ""
+
+        caption_lines = [
+            f"🎯 <b>{_esc(ev.name_vi)}</b> — top pick",
+            f"<b>{title}…</b>",
+            f"{price} · conv {conv} · {verdict}",
+        ]
+        if insights:
+            caption_lines.append(f"💡 {insights}")
+        if link:
+            caption_lines.append(f'<a href="{link}">Xem trên Etsy</a>')
+        caption = "\n".join(caption_lines)
+        items.append({"photo": url, "caption": caption})
+    return items
+
+
+# ==========================================================
+#  Main build + send
+# ==========================================================
+
+def build_and_send() -> None:
     now = datetime.now(timezone.utc)
 
     history = _load_history()
     totals = _weekly_shop_totals(history, days=7)
-
     kw_reports = keyword_tracker.run()
-
-    print("[weekly_report] fetching YTrends find_trending_keywords")
-    trending = _ytrends_list("ytrends_find_trending_keywords", {"country": "US"})
-
-    print("[weekly_report] fetching YTrends find_hidden_gems")
-    gems = _ytrends_list("ytrends_find_hidden_gems", {"country": "US"})
-
     events = holiday_advisor.upcoming(lookahead_days=LOOKAHEAD_DAYS)
 
-    narrative = _generate_narrative(totals, kw_reports, trending, gems, events)
+    print("[weekly_report] fetching market_snapshot")
+    snap = yta.get_market_snapshot(country="US")
 
+    print("[weekly_report] fetching find_hot_listings")
+    hot = yta.get_hot_listings(limit=8)
+
+    print("[weekly_report] fetching trending + gems")
+    trending = yta.get_trending(limit=25)
+    gems = yta.get_gems(limit=25)
+    inter = yta.intersection(trending, gems)
+    clusters = yta.cluster_by_token(trending + gems, key="tag", min_cluster=3)
+
+    print(f"[weekly_report] seasonal picks (up to {MAX_SEASONAL_EVENTS} events)")
+    picks = yta.seasonal_picks(events, max_events=MAX_SEASONAL_EVENTS)
+
+    narrative = _generate_narrative(snap, hot, inter, picks, totals, kw_reports)
+
+    # ── Main text message ──────────────────────────────────
     sections = [
         _format_header(now),
+        _format_macro(snap),
+        _format_hot_summary(hot),
+        _format_intersection(inter),
+        _format_clusters(clusters),
+        _format_seasonal_summary(picks),
         _format_shop_week(totals),
         _format_keywords_tracked(kw_reports),
-        _format_trending(trending),
-        _format_gems(gems),
-        _format_holidays(events),
         narrative,
     ]
-    return "\n\n".join(sections)
+    main_text = "\n\n".join(s for s in sections if s)
+
+    telegram_sender.send(main_text)
+
+    # ── Media group: hot listings ─────────────────────────
+    hot_album = _hot_media_group(hot)
+    if hot_album:
+        print(f"[weekly_report] sending hot-listings album ({len(hot_album)} photos)")
+        telegram_sender.send_media_group(hot_album)
+
+    # ── One media group per seasonal pick ─────────────────
+    for p in picks:
+        album = _seasonal_media_group(p)
+        if album:
+            print(f"[weekly_report] sending seasonal album for {p['event'].name} "
+                  f"({len(album)} photos)")
+            telegram_sender.send_media_group(album)
 
 
 def main() -> None:
-    report = build_report()
-    telegram_sender.send(report)
+    build_and_send()
 
 
 if __name__ == "__main__":

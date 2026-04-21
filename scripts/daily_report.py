@@ -14,6 +14,7 @@ Env vars (see .env.example):
 """
 from __future__ import annotations
 
+import html
 import os
 import random
 import sys
@@ -27,6 +28,7 @@ import shop_tracker
 import holiday_advisor
 import keyword_tracker
 import telegram_sender
+import ytrends_analytics as yta
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -165,6 +167,28 @@ KW_NO_DATA_LINES = [
 
 def _pick(pool: list[str], **kwargs) -> str:
     return random.choice(pool).format(**kwargs)
+
+
+def _esc(s: object) -> str:
+    # unescape first to avoid double-encoding pre-escaped API text (e.g. &#39;)
+    raw = html.unescape(str(s))
+    return (raw.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _esc_trim(s: object, n: int) -> str:
+    """Unescape → trim to N chars (clean text) → re-escape. Avoids cutting
+    mid-entity like `&#39;` which would then get mangled to `&amp;#`."""
+    raw = html.unescape(str(s or ""))[:n]
+    return (raw.replace("&", "&amp;")
+            .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def _fmt_money(x) -> str:
+    try:
+        return f"${float(x):,.0f}"
+    except (TypeError, ValueError):
+        return "?"
 
 
 # ==========================================================
@@ -359,6 +383,53 @@ def _format_keyword_section(reports: list) -> str:
     return "\n".join(lines)
 
 
+def _format_hot_today(hot: list[dict]) -> str:
+    """Compact 3-listing summary. Full thumbnails sent as separate album."""
+    if not hot:
+        return ""
+    lines = [f"🔥 <b>HOT HÔM NAY</b> — top {min(3, len(hot))} listing đang outperform niche"]
+    for i, h in enumerate(hot[:3], 1):
+        title = _esc_trim(h.get("title"), 55)
+        price = _fmt_money(h.get("price_usd") or h.get("price"))
+        country = h.get("shop_country") or "?"
+        conv_x = h.get("conversion_multiplier")
+        try:
+            conv_str = f"{float(conv_x):.1f}x conv"
+        except (TypeError, ValueError):
+            conv_str = ""
+        lines.append(f"{i}. <b>{title}…</b>")
+        lines.append(f"   · {price} · {country} · {conv_str}")
+    lines.append("  📷 <i>ảnh album bên dưới</i>")
+    return "\n".join(lines)
+
+
+def _hot_media_group(hot: list[dict], n: int = 3) -> list[dict]:
+    items = []
+    for h in hot[:n]:
+        url = h.get("image_url")
+        if not url:
+            continue
+        title = _esc_trim(h.get("title"), 80)
+        price = _fmt_money(h.get("price_usd") or h.get("price"))
+        country = h.get("shop_country") or "?"
+        conv_x = h.get("conversion_multiplier")
+        why = _esc_trim(h.get("why_hot_detail"), 150)
+        listing_id = h.get("listing_id")
+        link = f"https://www.etsy.com/listing/{listing_id}" if listing_id else ""
+        try:
+            conv_str = f"{float(conv_x):.1f}x conv"
+        except (TypeError, ValueError):
+            conv_str = ""
+        cap = [f"🔥 <b>{title}…</b>",
+               f"{price} · {country} · {conv_str}".strip()]
+        if why:
+            cap.append(f"💡 {why}")
+        if link:
+            cap.append(f'<a href="{link}">Xem trên Etsy</a>')
+        items.append({"photo": url, "caption": "\n".join(cap)})
+    return items
+
+
 def _format_actions(history: dict, events: list, kw_reports: list) -> str:
     actions = []
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -398,26 +469,36 @@ def _format_actions(history: dict, events: list, kw_reports: list) -> str:
 #  MAIN
 # ==========================================================
 
-def build_report() -> str:
+def build_report() -> tuple[str, list[dict]]:
+    """Return (text_report, hot_media_items). Caller sends both."""
     today_vn = datetime.now(timezone.utc).strftime("%d/%m/%Y")
 
     history = shop_tracker.run()
     events = holiday_advisor.upcoming()
     kw_reports = keyword_tracker.run()
 
+    print("[daily_report] fetching find_hot_listings")
+    hot = yta.get_hot_listings(limit=5)
+
     sections = [
         f"🌞 <b>BẢN TIN MAVIGO</b> — {today_vn}",
         _format_shop_section(history),
+        _format_hot_today(hot),
         _format_keyword_section(kw_reports),
         _format_holiday_section(events),
         _format_actions(history, events, kw_reports),
     ]
-    return "\n\n".join(sections)
+    text = "\n\n".join(s for s in sections if s)
+    album = _hot_media_group(hot, n=3)
+    return text, album
 
 
 def main() -> None:
-    report = build_report()
-    telegram_sender.send(report)
+    text, album = build_report()
+    telegram_sender.send(text)
+    if album:
+        print(f"[daily_report] sending hot album ({len(album)} photos)")
+        telegram_sender.send_media_group(album)
 
 
 if __name__ == "__main__":
