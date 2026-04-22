@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T06:47:39+00:00",
+  "last_updated": "2026-04-22T08:02:09+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -15,7 +15,7 @@
           "date": "2026-04-22",
           "total_sales": 1,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
         }
       ]
     },
@@ -56,8 +56,8 @@
         {
           "date": "2026-04-22",
           "total_sales": 4,
-          "delta": 0,
-          "error": null
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
         }
       ]
     },
@@ -165,7 +165,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
         }
       ]
     },
@@ -177,7 +177,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
         }
       ]
     },
@@ -189,7 +189,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
         }
       ]
     },
@@ -201,7 +201,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
         }
       ]
     },
@@ -213,7 +213,19 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "HTTP 500"
+          "error": "API HTTP 500"
+        }
+      ]
+    },
+    "magicmoonsh.etsy.com": {
+      "platform": "etsy",
+      "url": "https://magicmoonsh.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "API HTTP 500"
         }
       ]
     }
