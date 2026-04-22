@@ -9,6 +9,7 @@ burning API calls.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 from dataclasses import dataclass, asdict
@@ -17,6 +18,7 @@ from pathlib import Path
 
 import yaml
 
+import sheet_loader
 from ytrends_client import YTrendsClient, extract_structured
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -48,11 +50,26 @@ class KeywordReport:
 
 # ---------- Config + cache ----------
 
-def load_keywords() -> list[str]:
+def _load_keywords_from_yaml() -> list[str]:
     if not KEYWORDS_FILE.exists():
         return []
     data = yaml.safe_load(KEYWORDS_FILE.read_text(encoding="utf-8")) or {}
     return [k.strip() for k in (data.get("keywords") or []) if k and str(k).strip()]
+
+
+def load_keywords() -> list[str]:
+    """Prefer Google Sheet `keywords` tab when SHOPS_SHEET_URL is set, else YAML."""
+    sheet_url = (os.environ.get("SHOPS_SHEET_URL") or "").strip()
+    if sheet_url:
+        try:
+            kws = sheet_loader.load_keywords(sheet_url)
+            if kws:
+                return kws
+            print("[keyword_tracker] Sheet trả về 0 keyword — fallback keywords.yml")
+        except Exception as e:
+            print(f"[keyword_tracker] Sheet load failed ({type(e).__name__}: {e}) "
+                  f"— fallback keywords.yml")
+    return _load_keywords_from_yaml()
 
 
 def _load_cache() -> dict:

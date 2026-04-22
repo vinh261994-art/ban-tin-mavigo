@@ -96,6 +96,56 @@ def load_shops(sheet_url: str, timeout: float = 20.0) -> list[dict]:
     return shops
 
 
+def _to_gviz_url(url: str, sheet_name: str) -> str:
+    """Address a tab by name via gviz — works without knowing the tab's gid."""
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", url)
+    if not m:
+        raise ValueError(f"Không phải URL Google Sheets hợp lệ: {url}")
+    sheet_id = m.group(1)
+    from urllib.parse import quote
+    return (f"https://docs.google.com/spreadsheets/d/{sheet_id}"
+            f"/gviz/tq?tqx=out:csv&sheet={quote(sheet_name)}")
+
+
+def load_keywords(sheet_url: str, timeout: float = 20.0) -> list[str]:
+    """Fetch the `keywords` tab. Expected columns: keyword | active (optional).
+
+    Returns list of active keyword strings. Raises when tab doesn't exist or
+    has wrong schema — caller decides fallback to YAML.
+    """
+    gviz_url = _to_gviz_url(sheet_url, "keywords")
+    with httpx.Client(timeout=timeout, follow_redirects=True) as client:
+        r = client.get(gviz_url)
+        r.raise_for_status()
+    text = r.text.lstrip("﻿")
+    if "<html" in text.lower()[:500]:
+        raise RuntimeError(
+            "Không đọc được tab 'keywords' — Sheet chưa public hoặc tab chưa tạo")
+
+    reader = csv.DictReader(StringIO(text))
+    headers = {(h or "").strip().lower() for h in (reader.fieldnames or [])}
+    # gviz silently falls back to the first tab when target missing — guard
+    if "keyword" not in headers:
+        raise RuntimeError(
+            "Tab 'keywords' chưa tồn tại hoặc sai schema (cần ít nhất cột 'keyword')")
+
+    out: list[str] = []
+    skipped = 0
+    for row in reader:
+        norm = {(k or "").strip().lower(): (v or "").strip()
+                for k, v in row.items() if k}
+        kw = norm.get("keyword", "")
+        if not kw:
+            skipped += 1
+            continue
+        if not _is_active(norm.get("active", "")):
+            skipped += 1
+            continue
+        out.append(kw)
+    print(f"[sheet_loader] loaded {len(out)} keyword (bỏ {skipped} row trống/tắt)")
+    return out
+
+
 if __name__ == "__main__":
     # Quick CLI test: python sheet_loader.py <url>
     import os
@@ -105,3 +155,9 @@ if __name__ == "__main__":
         sys.exit(2)
     for s in load_shops(url):
         print(f"  {s['platform']:5} {s['name']:25} {s['url']}")
+    print("\n--- keywords ---")
+    try:
+        for kw in load_keywords(url):
+            print(f"  {kw}")
+    except Exception as e:
+        print(f"  (load_keywords: {type(e).__name__}: {e})")

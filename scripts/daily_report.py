@@ -258,6 +258,18 @@ def _format_shop_section(history: dict) -> str:
         for r in top:
             lines.append(f"    • {r['name']}  <b>+{r['delta']}</b>  (total {r['total']})")
 
+    # Full breakdown — every shop, sorted platform then name
+    lines.append("▸ 📊 Chi tiết từng shop:")
+    for r in sorted(rows, key=lambda x: (x["platform"], x["name"].lower())):
+        tag = f"[{r['platform']}]"
+        if r["error"]:
+            lines.append(f"    • {tag} <b>{r['name']}</b> — ⚠ {r['error']}")
+        elif r["delta"] is None:
+            lines.append(f"    • {tag} <b>{r['name']}</b> — total {r['total']} (mới)")
+        else:
+            sign = f"+{r['delta']}" if r["delta"] > 0 else str(r["delta"])
+            lines.append(f"    • {tag} <b>{r['name']}</b> — total {r['total']} (Δ{sign})")
+
     # Idle shops
     idle = [r for r in rows if r["idle_days"] >= 3]
     if idle:
