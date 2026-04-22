@@ -124,17 +124,19 @@ def load_keywords(sheet_url: str, timeout: float = 20.0) -> list[str]:
 
     reader = csv.DictReader(StringIO(text))
     headers = {(h or "").strip().lower() for h in (reader.fieldnames or [])}
+    # Accept both 'keyword' and 'keywords' (user often types plural by instinct)
+    kw_col = "keyword" if "keyword" in headers else ("keywords" if "keywords" in headers else None)
     # gviz silently falls back to the first tab when target missing — guard
-    if "keyword" not in headers:
+    if not kw_col:
         raise RuntimeError(
-            "Tab 'keywords' chưa tồn tại hoặc sai schema (cần ít nhất cột 'keyword')")
+            "Tab 'keywords' chưa tồn tại hoặc sai schema (cần cột 'keyword' hoặc 'keywords')")
 
     out: list[str] = []
     skipped = 0
     for row in reader:
         norm = {(k or "").strip().lower(): (v or "").strip()
                 for k, v in row.items() if k}
-        kw = norm.get("keyword", "")
+        kw = norm.get(kw_col, "")
         if not kw:
             skipped += 1
             continue
