@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T09:57:27+00:00",
+  "last_updated": "2026-04-22T10:01:53+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -13,8 +13,8 @@
         },
         {
           "date": "2026-04-22",
-          "total_sales": 1,
-          "delta": 0,
+          "total_sales": 0,
+          "delta": -1,
           "error": null
         }
       ]
@@ -56,7 +56,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 4,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -67,8 +67,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 10,
-          "delta": 0,
+          "total_sales": 0,
+          "delta": -10,
           "error": null
         }
       ]
@@ -81,7 +81,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -103,8 +103,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 455,
-          "delta": 0,
+          "total_sales": 0,
+          "delta": -455,
           "error": null
         }
       ]
@@ -218,6 +218,78 @@
       ]
     },
     "magicmoonsh.etsy.com": {
+      "platform": "etsy",
+      "url": "https://magicmoonsh.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 2,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "pineappleandlove": {
+      "platform": "etsy",
+      "url": "https://pineappleandlove.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 428,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "cngbycng": {
+      "platform": "etsy",
+      "url": "https://cngbycng.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "suirhana": {
+      "platform": "etsy",
+      "url": "https://suirhana.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 65,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "diepthanhboutique": {
+      "platform": "etsy",
+      "url": "https://diepthanhboutique.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 236,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "dastarco": {
+      "platform": "etsy",
+      "url": "https://dastarco.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 297,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "magicmoonsh": {
       "platform": "etsy",
       "url": "https://magicmoonsh.etsy.com",
       "snapshots": [
