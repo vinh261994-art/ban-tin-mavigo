@@ -134,6 +134,43 @@ function _scrapeShop(platform, url) {
   return { total: null, error: 'parse failed' };
 }
 
+/**
+ * Debug helper: fetch ONE shop URL, log what eBay/Etsy actually returned.
+ * Edit the URL in the function body, run it, copy the Execution log back.
+ * This tells us whether the page has the markers we expect.
+ */
+function debugShop() {
+  const url = 'https://www.ebay.com/str/stephanie9121';  // edit here
+  const ua = USER_AGENTS[0];
+  const resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    followRedirects: true,
+    headers: {
+      'User-Agent': ua,
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Upgrade-Insecure-Requests': '1',
+    },
+  });
+  const code = resp.getResponseCode();
+  const html = resp.getContentText();
+  const size = html.length;
+  console.log(`[debug] ${url}`);
+  console.log(`  status: ${code}, size: ${size} chars`);
+  console.log(`  has 'items sold': ${/items sold/i.test(html)}`);
+  console.log(`  has 'TextSpan':   ${html.indexOf('TextSpan') >= 0}`);
+  console.log(`  has 'PRESENCE_INFORMATION_MODULE': ${html.indexOf('PRESENCE_INFORMATION_MODULE') >= 0}`);
+  console.log(`  has 'Sales':      ${/>\s*[\d,]+\s*Sales?\s*</i.test(html)}`);
+  console.log(`  has 'captcha':    ${/captcha|robot|verify/i.test(html)}`);
+  console.log(`  title: ${(html.match(/<title[^>]*>([^<]{0,120})<\/title>/i) || [,''])[1]}`);
+  console.log(`  first 400 chars:\n${html.substring(0, 400)}`);
+  // Dump a window around "items sold" if present
+  const m = html.toLowerCase().indexOf('items sold');
+  if (m >= 0) {
+    console.log(`  context around "items sold" (±200):\n${html.substring(Math.max(0, m - 200), m + 80)}`);
+  }
+}
+
 /** Helper: clean rows older than 60 days from 'sales' tab to keep it tidy. */
 function pruneOldSales(keepDays) {
   if (!keepDays) keepDays = 60;
