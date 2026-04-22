@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T04:40:39+00:00",
+  "last_updated": "2026-04-22T06:47:39+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -116,7 +116,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 110,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -152,8 +152,68 @@
         {
           "date": "2026-04-22",
           "total_sales": 467,
-          "delta": null,
+          "delta": 0,
           "error": null
+        }
+      ]
+    },
+    "pineappleandlove.etsy.com": {
+      "platform": "etsy",
+      "url": "https://pineappleandlove.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 500"
+        }
+      ]
+    },
+    "cngbycng.etsy.com": {
+      "platform": "etsy",
+      "url": "https://cngbycng.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 500"
+        }
+      ]
+    },
+    "suirhana.etsy.com": {
+      "platform": "etsy",
+      "url": "https://suirhana.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 500"
+        }
+      ]
+    },
+    "diepthanhboutique.etsy.com": {
+      "platform": "etsy",
+      "url": "https://diepthanhboutique.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 500"
+        }
+      ]
+    },
+    "dastarco.etsy.com": {
+      "platform": "etsy",
+      "url": "https://dastarco.etsy.com",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 500"
         }
       ]
     }
