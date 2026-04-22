@@ -59,10 +59,35 @@ class Snapshot:
     error: Optional[str] = None   # set if scrape/parse failed this run
 
 
+SCRAPER_API_KEY = (os.environ.get("SCRAPER_API_KEY") or "").strip()
+
+
+def _wrap_url(url: str) -> str:
+    """Route target URL through ScraperAPI when the key is set. This bypasses
+    the GHA IP block on Etsy (403) and eBay bot-detection. Free tier gives
+    1000 req/month — plenty for daily+weekly on ~10 shops."""
+    if not SCRAPER_API_KEY:
+        return url
+    from urllib.parse import quote
+    return (
+        f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}"
+        f"&country_code=us&url={quote(url, safe='')}"
+    )
+
+
 def _fetch(url: str, timeout: float = 25.0) -> str:
-    headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
-    with httpx.Client(timeout=timeout, follow_redirects=True, headers=headers) as client:
-        r = client.get(url)
+    if SCRAPER_API_KEY:
+        # ScraperAPI handles UA/IP rotation itself; passing our headers can
+        # confuse it. Also proxy round-trip is slower, bump timeout.
+        fetch_url = _wrap_url(url)
+        headers: dict = {}
+        t = 70.0
+    else:
+        fetch_url = url
+        headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
+        t = timeout
+    with httpx.Client(timeout=t, follow_redirects=True, headers=headers) as client:
+        r = client.get(fetch_url)
         r.raise_for_status()
         return r.text
 
@@ -178,47 +203,18 @@ def load_shops() -> list[dict]:
     return _load_shops_from_yaml()
 
 
-def _load_sales_from_sheet(today: str) -> dict[tuple[str, str], dict]:
-    """Try to read today's sales from the Sheet's `sales` tab (written by Apps
-    Script). Returns {} on any failure — caller falls back to live scrape."""
-    sheet_url = (os.environ.get("SHOPS_SHEET_URL") or "").strip()
-    if not sheet_url:
-        return {}
-    try:
-        sales = sheet_loader.load_sales(sheet_url, date=today)
-        if sales:
-            print(f"[shop_tracker] Sheet sales: {len(sales)} row cho {today}")
-            return sales
-        print(f"[shop_tracker] Sheet sales: 0 row cho {today} — fallback scrape")
-    except Exception as e:
-        print(f"[shop_tracker] load_sales failed ({type(e).__name__}: {e}) "
-              f"— fallback scrape")
-    return {}
-
-
 def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     shops = load_shops()
     history = load_history()
     shop_map = history.setdefault("shops", {})
 
-    sheet_sales = _load_sales_from_sheet(today)
-    mode = "sheet+scrape" if sheet_sales else "scrape"
-    print(f"[shop_tracker] {today} · {mode} {len(shops)} shops")
+    mode = "via ScraperAPI" if SCRAPER_API_KEY else "direct"
+    print(f"[shop_tracker] {today} · scraping {len(shops)} shops ({mode})")
 
     for i, shop in enumerate(shops, 1):
         key = shop["name"]
-        # Prefer Apps Script sales when available — avoids Etsy 403 on GHA IP
-        sheet_row = sheet_sales.get((shop["platform"], key))
-        if sheet_row and sheet_row["total_sales"] is not None:
-            total, err = sheet_row["total_sales"], None
-            src = "sheet"
-        elif sheet_row and sheet_row.get("error"):
-            total, err = None, f"sheet: {sheet_row['error']}"
-            src = "sheet"
-        else:
-            total, err = scrape_shop(shop["platform"], shop["url"])
-            src = "scrape"
+        total, err = scrape_shop(shop["platform"], shop["url"])
 
         entry = shop_map.setdefault(key, {
             "platform": shop["platform"],
@@ -235,14 +231,14 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
         if err:
             snap = Snapshot(date=today, total_sales=prev["total_sales"] if prev else 0,
                             delta=None, error=err)
-            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} ⚠ {err} ({src})")
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} ⚠ {err}")
         else:
             delta = None
             if prev and prev.get("total_sales") is not None and not prev.get("error"):
                 delta = total - prev["total_sales"]
             snap = Snapshot(date=today, total_sales=total, delta=delta)
             marker = "✓" if delta is None else f"Δ{delta:+d}"
-            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} {marker} (total={total}, {src})")
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} {marker} (total={total})")
 
         # If we already wrote a snapshot for `today`, overwrite (idempotent same-day runs)
         if snaps and snaps[-1]["date"] == today:
@@ -250,8 +246,8 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
         else:
             snaps.append(asdict(snap))
 
-        # Polite delay only when we actually scraped
-        if src == "scrape" and i < len(shops):
+        # Polite delay — ScraperAPI handles pacing itself but small gap is harmless
+        if i < len(shops):
             time.sleep(random.uniform(*delay_range))
 
     history["last_updated"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
