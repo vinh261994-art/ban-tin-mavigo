@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T04:25:49+00:00",
+  "last_updated": "2026-04-22T04:40:39+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -117,7 +117,7 @@
           "date": "2026-04-22",
           "total_sales": 110,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -140,7 +140,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 262,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -151,9 +151,9 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 0,
+          "total_sales": 467,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     }

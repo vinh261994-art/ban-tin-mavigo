@@ -52,5 +52,23 @@
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation"
     }
+  },
+  "crochet": {
+    "cached_at": "2026-04-22T04:40:43+00:00",
+    "report": {
+      "keyword": "crochet",
+      "bucket": "spike",
+      "opportunity_score": 57.8,
+      "competition": "high",
+      "action": "competitive",
+      "trend": "rising",
+      "trend_strength": 2.0906,
+      "revenue_change_pct": 13091.78,
+      "price_range": "5-20",
+      "total_listings": 2285,
+      "demand_supply_ratio": 0.17,
+      "error": "",
+      "action_reason_en": "Decent market but crowded — need strong differentiation"
+    }
   }
 }
