@@ -47,11 +47,15 @@ class KeywordReport:
     demand_supply_ratio: float = 0.0
     error: str = ""
     action_reason_en: str = ""
-    # Top competitor shop in this niche (by revenue). YTrends exposes id only.
+    # Top competitor shop in this niche (by revenue). YTrends exposes id only;
+    # top_shop_sample_listing_id points at one of the shop's listings so the
+    # bulletin can link to etsy.com/listing/<id> — user clicks through to see
+    # the shop name + inventory. 0 when no match found among scanned listings.
     top_shop_id: int = 0
     top_shop_country: str = ""
     top_shop_revenue_usd: float = 0.0
     top_shop_listings: int = 0
+    top_shop_sample_listing_id: int = 0
     # Best-selling listing in this niche (by total_sold).
     top_listing_id: int = 0
     top_listing_title: str = ""
@@ -161,17 +165,31 @@ def _top_shop(client: YTrendsClient, keyword: str) -> dict:
         return {}
 
 
-def _top_listing(client: YTrendsClient, keyword: str) -> dict:
-    """Best-selling listing in this niche. Returns {} on failure (non-critical)."""
+def _hot_listings(client: YTrendsClient, keyword: str, limit: int = 25,
+                  sort: str = "sales") -> list[dict]:
+    """Top listings in the niche. Returns [] on failure."""
     try:
         res = client.call_tool("ytrends_find_hot_listings",
-                               {"keyword": keyword, "sort": "sales", "limit": 1})
+                               {"keyword": keyword, "sort": sort, "limit": limit})
         data = extract_structured(res) or {}
-        listings = ((data.get("data") or {}).get("listings")) or []
-        return listings[0] if listings else {}
+        return ((data.get("data") or {}).get("listings")) or []
     except Exception as e:
         print(f"    [find_hot_listings fail: {type(e).__name__}: {e}]")
-        return {}
+        return []
+
+
+def _find_shop_sample_listing(listings: list[dict], shop_id: int) -> int:
+    """Return the first listing_id belonging to shop_id, or 0 if no match in list.
+
+    YTrends doesn't expose shop names — but a listing URL lands the user on a
+    page that shows the shop header, which is a 1-click path to the real shop.
+    """
+    if not shop_id:
+        return 0
+    for l in listings:
+        if int(l.get("shop_id") or 0) == shop_id:
+            return int(l.get("listing_id") or 0)
+    return 0
 
 
 def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
@@ -188,9 +206,18 @@ def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
     if not stats:
         return KeywordReport(keyword=keyword, bucket="error", error="empty stats in response")
 
-    # Supplementary calls — failures degrade gracefully (empty top_shop/top_listing)
+    # Supplementary calls — failures degrade gracefully (empty shop/listings)
     shop = _top_shop(client, keyword)
-    listing = _top_listing(client, keyword)
+    # Two sorts because top_shop wins on total revenue, which often doesn't put
+    # its items in sort=sales top list — high-converter shops surface more
+    # reliably under sort=conversion. Union both when scanning for shop match.
+    listings_by_sales = _hot_listings(client, keyword, limit=10)
+    top_listing = listings_by_sales[0] if listings_by_sales else {}
+    shop_id_int = int(_f(shop.get("shop_id")))
+    top_shop_sample = _find_shop_sample_listing(listings_by_sales, shop_id_int)
+    if not top_shop_sample and shop_id_int:
+        listings_by_conv = _hot_listings(client, keyword, limit=10, sort="conversion")
+        top_shop_sample = _find_shop_sample_listing(listings_by_conv, shop_id_int)
 
     bucket = _classify(stats, latest)
     return KeywordReport(
@@ -210,11 +237,12 @@ def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
         top_shop_country=str(shop.get("shop_country") or ""),
         top_shop_revenue_usd=_f(shop.get("total_revenue_usd")),
         top_shop_listings=int(_f(shop.get("listings"))),
-        top_listing_id=int(_f(listing.get("listing_id"))),
-        top_listing_title=str(listing.get("title") or ""),
-        top_listing_price_usd=_f(listing.get("price_usd") or listing.get("price")),
-        top_listing_total_sold=int(_f(listing.get("total_sold"))),
-        top_listing_revenue_usd=_f(listing.get("revenue")),
+        top_shop_sample_listing_id=top_shop_sample,
+        top_listing_id=int(_f(top_listing.get("listing_id"))),
+        top_listing_title=str(top_listing.get("title") or ""),
+        top_listing_price_usd=_f(top_listing.get("price_usd") or top_listing.get("price")),
+        top_listing_total_sold=int(_f(top_listing.get("total_sold"))),
+        top_listing_revenue_usd=_f(top_listing.get("revenue")),
     )
 
 

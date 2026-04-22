@@ -399,11 +399,19 @@ def _format_keyword_section(reports: list) -> str:
         if r.price_range and r.price_range not in ("?", "nan-nan"):
             lines.append(f"    💵 giá gợi ý ${_esc(r.price_range)}")
 
-        # Top shop (by revenue in this niche)
+        # Top shop (by revenue in this niche). YTrends doesn't expose shop
+        # names, so if we spotted one of the shop's listings among the hot
+        # listings we link to it — the product page header reveals the real
+        # shop name + a link to the storefront (2-click path).
         if r.top_shop_id:
             country = r.top_shop_country or "?"
+            if r.top_shop_sample_listing_id:
+                sample_url = f"https://www.etsy.com/listing/{r.top_shop_sample_listing_id}"
+                shop_label = f'<a href="{sample_url}">Shop #{r.top_shop_id}</a>'
+            else:
+                shop_label = f"<code>#{r.top_shop_id}</code>"
             lines.append(
-                f"    🏪 Top shop: <code>#{r.top_shop_id}</code> ({_esc(country)}) "
+                f"    🏪 Top shop: {shop_label} ({_esc(country)}) "
                 f"— {_fmt_money(r.top_shop_revenue_usd)} doanh thu, "
                 f"{r.top_shop_listings} listing"
             )
