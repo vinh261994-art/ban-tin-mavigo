@@ -59,44 +59,51 @@ class Snapshot:
     error: Optional[str] = None   # set if scrape/parse failed this run
 
 
-SCRAPER_API_KEY = (os.environ.get("SCRAPER_API_KEY") or "").strip()
+SCRAPFLY_API_KEY = (os.environ.get("SCRAPFLY_API_KEY") or "").strip()
 
 
-def _wrap_url(url: str, platform: str | None = None) -> str:
-    """Route target URL through ScraperAPI when the key is set.
+class _ScrapeError(RuntimeError):
+    """Raised when the proxy returns a non-2xx target status."""
 
-    eBay: default proxy (1 credit/call) is enough.
-    Etsy: datacenter IPs get HTTP 500 — need premium residential pool
-          (10 credits/call). Budget ~3 Etsy shops × 30 days × 10 = 900,
-          still fits 1000/month free tier.
+
+def _fetch_scrapfly(url: str, platform: str | None) -> str:
+    """Fetch via Scrapfly API. Returns target HTML.
+
+    Credits:
+      eBay → default pool, 1 credit/call.
+      Etsy → asp=true (Anti Scraping Protection uses residential pool +
+             smart retry), ~5 credits/call. Essential because Etsy blocks
+             datacenter IPs with 403/500.
     """
-    if not SCRAPER_API_KEY:
-        return url
     from urllib.parse import quote
     params = [
-        f"api_key={SCRAPER_API_KEY}",
-        "country_code=us",
+        f"key={SCRAPFLY_API_KEY}",
+        "country=us",
         f"url={quote(url, safe='')}",
     ]
     if platform == "etsy":
-        params.append("premium=true")
-    return f"http://api.scraperapi.com?{'&'.join(params)}"
+        params.append("asp=true")
+    api_url = f"https://api.scrapfly.io/scrape?{'&'.join(params)}"
+    # Residential pool can take 30–60s
+    t = 120.0 if platform == "etsy" else 70.0
+    with httpx.Client(timeout=t, follow_redirects=True) as client:
+        r = client.get(api_url)
+        r.raise_for_status()
+    data = r.json()
+    result = data.get("result") or {}
+    target_status = int(result.get("status_code") or 0)
+    if target_status >= 400:
+        raise _ScrapeError(f"HTTP {target_status}")
+    return result.get("content") or ""
 
 
 def _fetch(url: str, platform: str | None = None, timeout: float = 25.0) -> str:
-    if SCRAPER_API_KEY:
-        # ScraperAPI handles UA/IP rotation itself; passing our headers can
-        # confuse it. Also proxy round-trip is slower, bump timeout.
-        fetch_url = _wrap_url(url, platform)
-        headers: dict = {}
-        # Premium residential pool can take 30-60s per request
-        t = 90.0 if platform == "etsy" else 70.0
-    else:
-        fetch_url = url
-        headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
-        t = timeout
-    with httpx.Client(timeout=t, follow_redirects=True, headers=headers) as client:
-        r = client.get(fetch_url)
+    if SCRAPFLY_API_KEY:
+        return _fetch_scrapfly(url, platform)
+    # Direct fetch — used for local dev; will 403 on GHA IP for Etsy
+    headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
+    with httpx.Client(timeout=timeout, follow_redirects=True, headers=headers) as client:
+        r = client.get(url)
         r.raise_for_status()
         return r.text
 
@@ -149,8 +156,10 @@ def scrape_shop(platform: str, url: str) -> tuple[Optional[int], Optional[str]]:
     """Returns (total_sales, error_msg). One of them is None."""
     try:
         html = _fetch(url, platform=platform)
+    except _ScrapeError as e:
+        return None, str(e)
     except httpx.HTTPStatusError as e:
-        return None, f"HTTP {e.response.status_code}"
+        return None, f"proxy HTTP {e.response.status_code}"
     except httpx.TransportError as e:
         return None, f"network: {type(e).__name__}"
 
@@ -218,7 +227,7 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
     history = load_history()
     shop_map = history.setdefault("shops", {})
 
-    mode = "via ScraperAPI" if SCRAPER_API_KEY else "direct"
+    mode = "via Scrapfly" if SCRAPFLY_API_KEY else "direct"
     print(f"[shop_tracker] {today} · scraping {len(shops)} shops ({mode})")
 
     for i, shop in enumerate(shops, 1):
