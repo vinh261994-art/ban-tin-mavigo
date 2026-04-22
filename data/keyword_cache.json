@@ -1,27 +1,36 @@
 {
   "linen apron": {
-    "cached_at": "2026-04-21T16:02:36+00:00",
+    "cached_at": "2026-04-22T08:45:47+00:00",
     "report": {
       "keyword": "linen apron",
       "bucket": "stable",
-      "opportunity_score": 48.9,
+      "opportunity_score": 48.7,
       "competition": "low",
       "action": "competitive",
       "trend": "rising",
-      "trend_strength": 0.1108,
+      "trend_strength": 0.1138,
       "revenue_change_pct": 0.36,
-      "price_range": "38-78.32",
-      "total_listings": 78,
+      "price_range": "38-77.74",
+      "total_listings": 79,
       "demand_supply_ratio": 0.14,
       "error": "",
-      "action_reason_en": "Decent market but crowded — need strong differentiation"
+      "action_reason_en": "Decent market but crowded — need strong differentiation",
+      "top_shop_id": 41151670,
+      "top_shop_country": "GB",
+      "top_shop_revenue_usd": 11717.12,
+      "top_shop_listings": 4,
+      "top_listing_id": 4408607266,
+      "top_listing_title": "Women & Kids Criss Cross Apron Sewing Pattern Set 2-16 Years Girls Crossback Pinafore Dress",
+      "top_listing_price_usd": 10.59,
+      "top_listing_total_sold": 234,
+      "top_listing_revenue_usd": 2134.08
     }
   },
   "birthday candle holder": {
-    "cached_at": "2026-04-21T16:02:43+00:00",
+    "cached_at": "2026-04-22T08:45:55+00:00",
     "report": {
       "keyword": "birthday candle holder",
-      "bucket": "stable",
+      "bucket": "no_data",
       "opportunity_score": 100.0,
       "competition": "low",
       "action": "insufficient_data",
@@ -32,43 +41,43 @@
       "total_listings": 0,
       "demand_supply_ratio": 0.0,
       "error": "",
-      "action_reason_en": "Not enough listings to evaluate — check back later"
+      "action_reason_en": "Not enough listings to evaluate — check back later",
+      "top_shop_id": 0,
+      "top_shop_country": "",
+      "top_shop_revenue_usd": 0.0,
+      "top_shop_listings": 0,
+      "top_listing_id": 0,
+      "top_listing_title": "",
+      "top_listing_price_usd": 0.0,
+      "top_listing_total_sold": 0,
+      "top_listing_revenue_usd": 0.0
     }
   },
   "custom dog portrait": {
-    "cached_at": "2026-04-21T16:02:47+00:00",
+    "cached_at": "2026-04-22T08:46:03+00:00",
     "report": {
       "keyword": "custom dog portrait",
       "bucket": "spike",
-      "opportunity_score": 47.9,
+      "opportunity_score": 48.3,
       "competition": "medium",
       "action": "competitive",
       "trend": "rising",
-      "trend_strength": 0.9642,
+      "trend_strength": 1.0256,
       "revenue_change_pct": 2.24,
-      "price_range": "16.5-40",
-      "total_listings": 462,
-      "demand_supply_ratio": 0.15,
-      "error": "",
-      "action_reason_en": "Decent market but crowded — need strong differentiation"
-    }
-  },
-  "crochet": {
-    "cached_at": "2026-04-22T04:40:43+00:00",
-    "report": {
-      "keyword": "crochet",
-      "bucket": "spike",
-      "opportunity_score": 57.8,
-      "competition": "high",
-      "action": "competitive",
-      "trend": "rising",
-      "trend_strength": 2.0906,
-      "revenue_change_pct": 13091.78,
-      "price_range": "5-20",
-      "total_listings": 2285,
+      "price_range": "16.6-40",
+      "total_listings": 470,
       "demand_supply_ratio": 0.17,
       "error": "",
-      "action_reason_en": "Decent market but crowded — need strong differentiation"
+      "action_reason_en": "Decent market but crowded — need strong differentiation",
+      "top_shop_id": 61290361,
+      "top_shop_country": "GB",
+      "top_shop_revenue_usd": 61073.5,
+      "top_shop_listings": 4,
+      "top_listing_id": 4455536828,
+      "top_listing_title": "Custom Dog Drawing Mug from Photo | Colorful Striped Mug with Dog Illustration, Pet Portrait from Photo",
+      "top_listing_price_usd": 5.99,
+      "top_listing_total_sold": 6,
+      "top_listing_revenue_usd": 35.94
     }
   }
 }

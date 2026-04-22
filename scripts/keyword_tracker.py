@@ -8,6 +8,7 @@ burning API calls.
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 import os
 import sys
@@ -46,6 +47,17 @@ class KeywordReport:
     demand_supply_ratio: float = 0.0
     error: str = ""
     action_reason_en: str = ""
+    # Top competitor shop in this niche (by revenue). YTrends exposes id only.
+    top_shop_id: int = 0
+    top_shop_country: str = ""
+    top_shop_revenue_usd: float = 0.0
+    top_shop_listings: int = 0
+    # Best-selling listing in this niche (by total_sold).
+    top_listing_id: int = 0
+    top_listing_title: str = ""
+    top_listing_price_usd: float = 0.0
+    top_listing_total_sold: int = 0
+    top_listing_revenue_usd: float = 0.0
 
 
 # ---------- Config + cache ----------
@@ -136,6 +148,32 @@ def _classify(stats: dict, latest_timeline: dict | None) -> str:
 
 # ---------- Query ----------
 
+def _top_shop(client: YTrendsClient, keyword: str) -> dict:
+    """Top competitor shop by revenue. Returns {} on failure (non-critical)."""
+    try:
+        res = client.call_tool("ytrends_analyze_competition",
+                               {"seed": keyword, "seed_type": "keyword"})
+        data = extract_structured(res) or {}
+        shops = ((data.get("data") or {}).get("top_shops")) or []
+        return shops[0] if shops else {}
+    except Exception as e:
+        print(f"    [analyze_competition fail: {type(e).__name__}: {e}]")
+        return {}
+
+
+def _top_listing(client: YTrendsClient, keyword: str) -> dict:
+    """Best-selling listing in this niche. Returns {} on failure (non-critical)."""
+    try:
+        res = client.call_tool("ytrends_find_hot_listings",
+                               {"keyword": keyword, "sort": "sales", "limit": 1})
+        data = extract_structured(res) or {}
+        listings = ((data.get("data") or {}).get("listings")) or []
+        return listings[0] if listings else {}
+    except Exception as e:
+        print(f"    [find_hot_listings fail: {type(e).__name__}: {e}]")
+        return {}
+
+
 def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
     try:
         res = client.call_tool("ytrends_research_keyword", {"keyword": keyword})
@@ -149,6 +187,10 @@ def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
 
     if not stats:
         return KeywordReport(keyword=keyword, bucket="error", error="empty stats in response")
+
+    # Supplementary calls — failures degrade gracefully (empty top_shop/top_listing)
+    shop = _top_shop(client, keyword)
+    listing = _top_listing(client, keyword)
 
     bucket = _classify(stats, latest)
     return KeywordReport(
@@ -164,6 +206,15 @@ def _research_one(client: YTrendsClient, keyword: str) -> KeywordReport:
         total_listings=int(_f(stats.get("total_listings"))),
         demand_supply_ratio=_f(stats.get("demand_supply_ratio")),
         action_reason_en=str(stats.get("action_reason") or ""),
+        top_shop_id=int(_f(shop.get("shop_id"))),
+        top_shop_country=str(shop.get("shop_country") or ""),
+        top_shop_revenue_usd=_f(shop.get("total_revenue_usd")),
+        top_shop_listings=int(_f(shop.get("listings"))),
+        top_listing_id=int(_f(listing.get("listing_id"))),
+        top_listing_title=str(listing.get("title") or ""),
+        top_listing_price_usd=_f(listing.get("price_usd") or listing.get("price")),
+        top_listing_total_sold=int(_f(listing.get("total_sold"))),
+        top_listing_revenue_usd=_f(listing.get("revenue")),
     )
 
 
@@ -177,11 +228,16 @@ def run(delay: float = 1.2) -> list[KeywordReport]:
     reports: list[KeywordReport] = []
     calls_made = 0
 
+    known_fields = {f.name for f in dataclasses.fields(KeywordReport)}
+
     with YTrendsClient() as client:
         for i, kw in enumerate(kws, 1):
             entry = cache.get(kw) or {}
             if _cache_fresh(entry.get("cached_at", "")):
-                rep = KeywordReport(**entry["report"])
+                # Drop fields the current schema doesn't know about (and let
+                # new fields default) so old caches don't crash on migration.
+                raw = entry.get("report") or {}
+                rep = KeywordReport(**{k: v for k, v in raw.items() if k in known_fields})
                 print(f"  [{i:2}/{len(kws)}] {kw:30} · cache ({rep.bucket})")
                 reports.append(rep)
                 continue

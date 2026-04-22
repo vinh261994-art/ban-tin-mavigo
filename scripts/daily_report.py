@@ -336,61 +336,88 @@ def _format_holiday_section(events: list) -> str:
     return "\n".join(lines)
 
 
+BUCKET_BADGES = {
+    "spike": "🚀 BỐC CHÁY",
+    "opportunity": "✨ CƠ HỘI",
+    "crowded": "🏟️ ĐÔNG",
+    "dying": "💀 CHẾT",
+    "stable": "😐 ỔN ĐỊNH",
+    "no_data": "❓ THIẾU DATA",
+    "error": "❌ LỖI",
+}
+
+BUCKET_PRIO = {"spike": 0, "opportunity": 1, "crowded": 2, "dying": 3,
+               "stable": 4, "no_data": 5, "error": 6}
+
+
 def _format_keyword_section(reports: list) -> str:
     if not reports:
         return ("🔥 <b>KEYWORD THEO DÕI</b>\n"
-                "  Chưa có keyword nào trong <code>config/keywords.yml</code> — điền vài cái đi, "
-                "có dữ liệu mới mỉa mai được.")
+                "  Chưa có keyword nào — điền vào tab <code>keywords</code> của Sheet "
+                "(hoặc <code>config/keywords.yml</code>), có dữ liệu mới mỉa mai được.")
 
-    buckets: dict[str, list] = {
-        "spike": [], "opportunity": [], "dying": [],
-        "crowded": [], "stable": [], "no_data": [], "error": [],
-    }
-    for r in reports:
-        buckets.setdefault(r.bucket, buckets["stable"]).append(r)
+    # Sort: interesting signals first, then by opportunity_score desc
+    sorted_reports = sorted(
+        reports,
+        key=lambda r: (BUCKET_PRIO.get(r.bucket, 99), -r.opportunity_score),
+    )
 
     lines = [f"🔥 <b>KEYWORD THEO DÕI</b> ({len(reports)} keyword)"]
 
-    if buckets["spike"]:
-        lines.append("▸ 🚀 ĐANG BỐC CHÁY:")
-        for r in buckets["spike"][:5]:
+    for r in sorted_reports:
+        badge = BUCKET_BADGES.get(r.bucket, r.bucket)
+
+        if r.bucket == "error":
+            lines.append(f"▸ <b>{_esc(r.keyword)}</b> [{badge}] — {_esc(r.error)}")
+            continue
+
+        # Header line: name + badge + niche size + competition + opportunity
+        header = (f"▸ <b>{_esc(r.keyword)}</b> [{badge}] "
+                  f"· <b>{r.total_listings:,}</b> listing "
+                  f"· comp {_esc(r.competition)} "
+                  f"· opp {r.opportunity_score:.0f}")
+        lines.append(header)
+
+        # Snark based on bucket (skip for stable — it's the default)
+        snark = None
+        if r.bucket == "spike":
             snark = _pick(KW_SPIKE_LINES, trend=r.trend, ts=r.trend_strength,
                           rev=r.revenue_change_pct, opp=r.opportunity_score)
-            lines.append(f"    • <b>{r.keyword}</b> — {snark}")
-            lines.append(f"       giá gợi ý ${r.price_range}  ·  {r.total_listings} listing")
-
-    if buckets["opportunity"]:
-        lines.append("▸ ✨ CƠ HỘI NGON:")
-        for r in buckets["opportunity"][:5]:
+        elif r.bucket == "opportunity":
             snark = _pick(KW_OPPORTUNITY_LINES, action=r.action,
                           opp=r.opportunity_score, comp=r.competition)
-            lines.append(f"    • <b>{r.keyword}</b> — {snark}")
-
-    if buckets["dying"]:
-        lines.append("▸ 💀 ĐANG CHẾT:")
-        for r in buckets["dying"][:5]:
+        elif r.bucket == "dying":
             snark = _pick(KW_DYING_LINES, trend=r.trend, rev=r.revenue_change_pct)
-            lines.append(f"    • <b>{r.keyword}</b> — {snark}")
-
-    if buckets["crowded"]:
-        lines.append("▸ 🏟️ QUÁ ĐÔNG:")
-        for r in buckets["crowded"][:5]:
+        elif r.bucket == "crowded":
             snark = _pick(KW_CROWDED_LINES, comp=r.competition, opp=r.opportunity_score)
-            lines.append(f"    • <b>{r.keyword}</b> — {snark}")
+        elif r.bucket == "no_data":
+            snark = _pick(KW_NO_DATA_LINES)
+        if snark:
+            lines.append(f"    💬 {snark}")
 
-    if buckets["no_data"]:
-        lines.append("▸ ❓ CHƯA ĐỦ DATA:")
-        for r in buckets["no_data"][:5]:
-            lines.append(f"    • <b>{r.keyword}</b> — {_pick(KW_NO_DATA_LINES)}")
+        # Price hint — skip placeholder ("?") and YTrends' "nan-nan" for no_data
+        if r.price_range and r.price_range not in ("?", "nan-nan"):
+            lines.append(f"    💵 giá gợi ý ${_esc(r.price_range)}")
 
-    if buckets["stable"]:
-        names = ", ".join(r.keyword for r in buckets["stable"][:8])
-        more = f" +{len(buckets['stable'])-8}" if len(buckets["stable"]) > 8 else ""
-        lines.append(f"▸ 😐 Ổn định (không biến động): {names}{more}")
+        # Top shop (by revenue in this niche)
+        if r.top_shop_id:
+            country = r.top_shop_country or "?"
+            lines.append(
+                f"    🏪 Top shop: <code>#{r.top_shop_id}</code> ({_esc(country)}) "
+                f"— {_fmt_money(r.top_shop_revenue_usd)} doanh thu, "
+                f"{r.top_shop_listings} listing"
+            )
 
-    if buckets["error"]:
-        names = ", ".join(r.keyword for r in buckets["error"][:5])
-        lines.append(f"▸ ❌ Query lỗi: {names}")
+        # Top listing (by total_sold in this niche)
+        if r.top_listing_id:
+            title = _esc_trim(r.top_listing_title, 70)
+            url = f"https://www.etsy.com/listing/{r.top_listing_id}"
+            price_str = (f"${r.top_listing_price_usd:.2f}"
+                         if r.top_listing_price_usd else "?")
+            lines.append(
+                f'    ⭐ Top listing: <a href="{url}">{title}</a> '
+                f'— {price_str}, đã bán {r.top_listing_total_sold}'
+            )
 
     return "\n".join(lines)
 
