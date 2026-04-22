@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T10:01:53+00:00",
+  "last_updated": "2026-04-22T16:34:29+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -14,7 +14,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 0,
-          "delta": -1,
+          "delta": 0,
           "error": null
         }
       ]
@@ -67,8 +67,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": -10,
+          "total_sales": 10,
+          "delta": 10,
           "error": null
         }
       ]
@@ -81,7 +81,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": null
+          "error": "parse failed (selector may have changed)"
         }
       ]
     },
@@ -103,8 +103,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": -455,
+          "total_sales": 455,
+          "delta": 455,
           "error": null
         }
       ]
@@ -115,8 +115,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 110,
-          "delta": 0,
+          "total_sales": 112,
+          "delta": 2,
           "error": null
         }
       ]
@@ -151,8 +151,8 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 467,
-          "delta": 0,
+          "total_sales": 469,
+          "delta": 2,
           "error": null
         }
       ]
@@ -236,7 +236,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 428,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -248,7 +248,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 0,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -260,7 +260,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 65,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -272,7 +272,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 236,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -284,7 +284,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 297,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -296,7 +296,7 @@
         {
           "date": "2026-04-22",
           "total_sales": 2,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
