@@ -147,6 +147,12 @@ def parse_ebay_sales(html: str) -> Optional[int]:
     m = EBAY_SOLD_PATTERN_FALLBACK.search(html)
     if m:
         return int(m.group(1).replace(",", ""))
+    # Page rendered normally but no sold widget → inactive/new seller with 0 sales.
+    # PRESENCE_INFORMATION_MODULE is present on every valid profile/store page,
+    # so its existence means the fetch succeeded; its absence means something
+    # else (bot block, redirect, etc.) — leave as parse failure in that case.
+    if "PRESENCE_INFORMATION_MODULE" in html:
+        return 0
     return None
 
 
@@ -221,25 +227,54 @@ def load_shops() -> list[dict]:
     return _load_shops_from_yaml()
 
 
+def _load_etsy_sales_from_sheet() -> dict[str, dict]:
+    """Pull Etsy sales from Apps Script's Data tab (free, no Akamai block).
+
+    Returns empty dict if SHOPS_SHEET_URL unset or read fails — caller falls
+    back to live ScrapingBee scrape in that case.
+    """
+    sheet_url = (os.environ.get("SHOPS_SHEET_URL") or "").strip()
+    if not sheet_url:
+        return {}
+    try:
+        return sheet_loader.load_etsy_sales(sheet_url)
+    except Exception as e:
+        print(f"[shop_tracker] không đọc được tab Data ({type(e).__name__}: {e}) "
+              f"— fallback scrape Etsy trực tiếp")
+        return {}
+
+
 def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     shops = load_shops()
     history = load_history()
     shop_map = history.setdefault("shops", {})
+    etsy_sales = _load_etsy_sales_from_sheet()
 
     mode = "via ScrapingBee" if SCRAPINGBEE_API_KEY else "direct"
-    print(f"[shop_tracker] {today} · scraping {len(shops)} shops ({mode})")
+    etsy_from_sheet = sum(1 for s in shops if s["platform"] == "etsy" and s["name"] in etsy_sales)
+    print(f"[shop_tracker] {today} · {len(shops)} shops — "
+          f"{etsy_from_sheet} Etsy từ Sheet, còn lại scrape ({mode})")
 
     for i, shop in enumerate(shops, 1):
         key = shop["name"]
-        total, err = scrape_shop(shop["platform"], shop["url"])
+        used_sheet = False
+
+        if shop["platform"] == "etsy" and key in etsy_sales:
+            snap_data = etsy_sales[key]
+            total = snap_data["total_sales"]
+            err = snap_data["error"] if snap_data["error"] else (
+                None if total is not None else "missing total in sheet")
+            used_sheet = True
+        else:
+            total, err = scrape_shop(shop["platform"], shop["url"])
 
         entry = shop_map.setdefault(key, {
             "platform": shop["platform"],
             "url": shop["url"],
             "snapshots": [],
         })
-        # Keep url/platform fresh if user edited shops.yml
+        # Keep url/platform fresh if user edited the shop list
         entry["platform"] = shop["platform"]
         entry["url"] = shop["url"]
 
@@ -247,16 +282,21 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
         prev = snaps[-1] if snaps else None
 
         if err:
-            snap = Snapshot(date=today, total_sales=prev["total_sales"] if prev else 0,
+            snap = Snapshot(date=today,
+                            total_sales=total if total is not None
+                                        else (prev["total_sales"] if prev else 0),
                             delta=None, error=err)
-            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} ⚠ {err}")
+            src = "sheet" if used_sheet else "scrape"
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} ⚠ {err} [{src}]")
         else:
             delta = None
             if prev and prev.get("total_sales") is not None and not prev.get("error"):
                 delta = total - prev["total_sales"]
             snap = Snapshot(date=today, total_sales=total, delta=delta)
             marker = "✓" if delta is None else f"Δ{delta:+d}"
-            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} {marker} (total={total})")
+            src = "sheet" if used_sheet else "scrape"
+            print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} "
+                  f"{marker} (total={total}) [{src}]")
 
         # If we already wrote a snapshot for `today`, overwrite (idempotent same-day runs)
         if snaps and snaps[-1]["date"] == today:
@@ -264,8 +304,8 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
         else:
             snaps.append(asdict(snap))
 
-        # Polite delay — ScraperAPI handles pacing itself but small gap is harmless
-        if i < len(shops):
+        # Polite delay only when we actually hit the network
+        if i < len(shops) and not used_sheet:
             time.sleep(random.uniform(*delay_range))
 
     history["last_updated"] = datetime.now(timezone.utc).isoformat(timespec="seconds")

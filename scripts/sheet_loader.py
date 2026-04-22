@@ -1,13 +1,15 @@
-"""Load shop list from a public Google Sheet (CSV export).
+"""Load shop list & Etsy sales data from a public Google Sheet.
 
-Expected columns (case-insensitive, any order):
-    platform   etsy | ebay
-    name       display name
-    url        public shop URL
-    active     TRUE/FALSE/1/0/YES/NO  (optional — default TRUE)
+Sheet layout (Sheet B, "Apps Script + bulletin"):
+    Config_Shops  — Etsy shops  (cols: Shop | URL | Active?)
+    shops_ebay    — eBay shops  (cols: Shop | URL | Active?)
+    Data          — Etsy sales history written by Apps Script
+                    (cols: Shop | Date | Sales_Total | Sales_Daily | ... |
+                           Fetch_Status | ...)
+    keywords      — tracked keywords (cols: keyword | active?)
 
-Sheet must be shared "Anyone with the link → Viewer". We fetch the
-`/export?format=csv` endpoint, no auth needed.
+Sheet must be shared "Anyone with the link → Viewer". We fetch gviz
+CSV endpoints, no auth needed.
 """
 from __future__ import annotations
 
@@ -21,27 +23,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 import httpx
 
-ALLOWED_PLATFORMS = {"etsy", "ebay"}
 TRUTHY = {"TRUE", "1", "YES", "Y", "T", "X", "✓"}
-
-
-def _to_csv_url(url: str) -> str:
-    """Convert any Google Sheets URL into its CSV export form.
-
-    Accepts:
-        - /spreadsheets/d/<ID>/edit#gid=<GID>
-        - /spreadsheets/d/<ID>/edit?usp=sharing
-        - /spreadsheets/d/<ID>/export?format=csv&gid=<GID>   (passthrough)
-    """
-    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", url)
-    if not m:
-        raise ValueError(f"Không phải URL Google Sheets hợp lệ: {url}")
-    sheet_id = m.group(1)
-    gid_m = re.search(r"[?#&]gid=(\d+)", url)
-    base = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
-    # Only pin gid if the user explicitly pointed at a tab. Without gid,
-    # Google exports the first tab — works regardless of its internal ID.
-    return f"{base}&gid={gid_m.group(1)}" if gid_m else base
 
 
 def _is_active(val: str) -> bool:
@@ -51,40 +33,42 @@ def _is_active(val: str) -> bool:
     return v in TRUTHY
 
 
-def load_shops(sheet_url: str, timeout: float = 20.0) -> list[dict]:
-    """Fetch the Sheet and parse rows into shop dicts.
+def _fetch_tab_csv(sheet_url: str, tab_name: str, timeout: float = 20.0) -> str:
+    """Fetch a tab by name via gviz CSV export.
 
-    Returns list of {"platform", "name", "url"} for active rows only.
-    Raises on network/auth/parse errors — caller decides whether to fallback.
+    Returns CSV text with BOM stripped. Raises RuntimeError if sheet isn't
+    public or tab doesn't exist (gviz falls back to first tab silently —
+    caller should validate expected columns).
     """
-    csv_url = _to_csv_url(sheet_url)
+    gviz_url = _to_gviz_url(sheet_url, tab_name)
     with httpx.Client(timeout=timeout, follow_redirects=True) as client:
-        r = client.get(csv_url)
+        r = client.get(gviz_url)
         r.raise_for_status()
-    # Google returns HTML (sign-in page) if Sheet isn't public — detect that
-    if "<html" in r.text.lower()[:500] or "signin" in r.url.path.lower():
+    text = r.text.lstrip("﻿")
+    if "<html" in text.lower()[:500]:
         raise RuntimeError(
-            "Sheet không public — cần chia sẻ 'Anyone with the link → Viewer'")
+            f"Không đọc được tab '{tab_name}' — Sheet chưa public hoặc tab chưa tạo")
+    return text
 
-    text = r.text.lstrip("﻿")   # strip BOM
-    reader = csv.DictReader(StringIO(text))
 
-    shops = []
+def _parse_shop_tab(csv_text: str, platform: str) -> tuple[list[dict], int]:
+    """Parse a shop list tab. Expected columns: Shop | URL | Active? (optional).
+
+    Returns (shops, skipped_count).
+    """
+    reader = csv.DictReader(StringIO(csv_text))
+    shops: list[dict] = []
     skipped = 0
     for row in reader:
         norm = {(k or "").strip().lower(): (v or "").strip()
                 for k, v in row.items() if k}
-        platform = norm.get("platform", "").lower()
-        name = norm.get("name", "")
+        # Accept "shop" or "name" as the display-name column
+        name = norm.get("shop") or norm.get("name") or ""
         url = norm.get("url", "")
-        if not (platform and url):
+        if not url:
             skipped += 1
             continue
-        if platform not in ALLOWED_PLATFORMS:
-            print(f"[sheet_loader] bỏ qua row platform lạ: {platform!r}")
-            skipped += 1
-            continue
-        if not _is_active(norm.get("active", "")):
+        if not _is_active(norm.get("active", "") or norm.get("active?", "")):
             skipped += 1
             continue
         shops.append({
@@ -92,7 +76,31 @@ def load_shops(sheet_url: str, timeout: float = 20.0) -> list[dict]:
             "name": name or url.rsplit("/", 1)[-1],
             "url": url,
         })
-    print(f"[sheet_loader] loaded {len(shops)} shop (bỏ {skipped} row trống/tắt)")
+    return shops, skipped
+
+
+def load_shops(sheet_url: str, timeout: float = 20.0) -> list[dict]:
+    """Fetch Etsy (Config_Shops) + eBay (shops_ebay) tabs and merge into one list.
+
+    Returns list of {"platform", "name", "url"} for active rows only.
+    Raises on network/auth errors. If shops_ebay is missing, logs and continues
+    with Etsy-only (caller fallback still applies).
+    """
+    etsy_csv = _fetch_tab_csv(sheet_url, "Config_Shops", timeout)
+    etsy_shops, etsy_skip = _parse_shop_tab(etsy_csv, "etsy")
+
+    ebay_shops: list[dict] = []
+    ebay_skip = 0
+    try:
+        ebay_csv = _fetch_tab_csv(sheet_url, "shops_ebay", timeout)
+        ebay_shops, ebay_skip = _parse_shop_tab(ebay_csv, "ebay")
+    except Exception as e:
+        print(f"[sheet_loader] tab 'shops_ebay' không đọc được ({type(e).__name__}: {e}) "
+              f"— bỏ qua eBay")
+
+    shops = etsy_shops + ebay_shops
+    print(f"[sheet_loader] loaded {len(etsy_shops)} etsy + {len(ebay_shops)} ebay "
+          f"(bỏ {etsy_skip + ebay_skip} row trống/tắt)")
     return shops
 
 
@@ -105,6 +113,59 @@ def _to_gviz_url(url: str, sheet_name: str) -> str:
     from urllib.parse import quote
     return (f"https://docs.google.com/spreadsheets/d/{sheet_id}"
             f"/gviz/tq?tqx=out:csv&sheet={quote(sheet_name)}")
+
+
+def _parse_int(v: str) -> int | None:
+    s = (v or "").strip().replace(",", "")
+    if not s:
+        return None
+    try:
+        return int(float(s))   # tolerate "12.0" that Sheets sometimes emits
+    except ValueError:
+        return None
+
+
+def load_etsy_sales(sheet_url: str, timeout: float = 20.0) -> dict[str, dict]:
+    """Read the `Data` tab written by Apps Script → latest snapshot per Etsy shop.
+
+    Data columns: Shop | Date | Sales_Total | Sales_Daily | ... | Fetch_Status | ...
+
+    Returns dict keyed by stripped shop name:
+        {"date": "YYYY-MM-DD", "total_sales": int | None,
+         "delta": int | None, "error": str | None}
+
+    Per shop we keep the row with the latest date, and within same date the last
+    row encountered (Apps Script appends chronologically, so that's the freshest).
+    Fetch_Status != "OK 200" becomes error; total/delta still filled when parseable.
+    """
+    text = _fetch_tab_csv(sheet_url, "Data", timeout)
+    reader = csv.DictReader(StringIO(text))
+
+    latest: dict[str, dict] = {}
+    for row in reader:
+        norm = {(k or "").strip().lower(): (v or "").strip()
+                for k, v in row.items() if k}
+        shop = norm.get("shop", "")
+        date = norm.get("date", "")
+        if not shop or not date:
+            continue
+
+        prev = latest.get(shop)
+        # Keep the row with max date; on tie, later row wins (Apps Script appends in order)
+        if prev and prev["date"] > date:
+            continue
+
+        status = norm.get("fetch_status", "")
+        err = None if status.upper().startswith("OK") else (status or "unknown status")
+        latest[shop] = {
+            "date": date,
+            "total_sales": _parse_int(norm.get("sales_total", "")),
+            "delta": _parse_int(norm.get("sales_daily", "")),
+            "error": err,
+        }
+
+    print(f"[sheet_loader] loaded sales for {len(latest)} etsy shop từ tab Data")
+    return latest
 
 
 def load_keywords(sheet_url: str, timeout: float = 20.0) -> list[str]:
@@ -163,3 +224,10 @@ if __name__ == "__main__":
             print(f"  {kw}")
     except Exception as e:
         print(f"  (load_keywords: {type(e).__name__}: {e})")
+    print("\n--- etsy sales (from Data tab) ---")
+    try:
+        for shop, snap in load_etsy_sales(url).items():
+            print(f"  {shop:25} {snap['date']} total={snap['total_sales']} "
+                  f"delta={snap['delta']} err={snap['error']}")
+    except Exception as e:
+        print(f"  (load_etsy_sales: {type(e).__name__}: {e})")
