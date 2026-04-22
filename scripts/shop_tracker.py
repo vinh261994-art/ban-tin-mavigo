@@ -84,8 +84,8 @@ def _fetch_scrapingbee(url: str, platform: str | None) -> str:
     if platform == "etsy":
         params["stealth_proxy"] = "true"
     api_url = f"https://app.scrapingbee.com/api/v1/?{urlencode(params)}"
-    # Premium proxy can take 30–60s
-    t = 90.0 if platform == "etsy" else 45.0
+    # Stealth proxy can take 60–150s — Akamai challenge solve is slow
+    t = 180.0 if platform == "etsy" else 45.0
     with httpx.Client(timeout=t, follow_redirects=True) as client:
         r = client.get(api_url)
     if r.status_code >= 400:
