@@ -79,5 +79,32 @@
       "top_listing_total_sold": 6,
       "top_listing_revenue_usd": 35.94
     }
+  },
+  "crochet": {
+    "cached_at": "2026-04-22T09:57:35+00:00",
+    "report": {
+      "keyword": "crochet",
+      "bucket": "spike",
+      "opportunity_score": 57.5,
+      "competition": "high",
+      "action": "competitive",
+      "trend": "rising",
+      "trend_strength": 2.0906,
+      "revenue_change_pct": 13091.78,
+      "price_range": "5-20",
+      "total_listings": 2303,
+      "demand_supply_ratio": 0.17,
+      "error": "",
+      "action_reason_en": "Decent market but crowded — need strong differentiation",
+      "top_shop_id": 42898103,
+      "top_shop_country": "CA",
+      "top_shop_revenue_usd": 38860.35,
+      "top_shop_listings": 5,
+      "top_listing_id": 4396392848,
+      "top_listing_title": "Clover poncho crochet pattern *DIGITAL PDF*",
+      "top_listing_price_usd": 8.01,
+      "top_listing_total_sold": 2184,
+      "top_listing_revenue_usd": 13104.0
+    }
   }
 }
