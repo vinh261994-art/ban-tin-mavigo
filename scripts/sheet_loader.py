@@ -38,9 +38,10 @@ def _to_csv_url(url: str) -> str:
         raise ValueError(f"Không phải URL Google Sheets hợp lệ: {url}")
     sheet_id = m.group(1)
     gid_m = re.search(r"[?#&]gid=(\d+)", url)
-    gid = gid_m.group(1) if gid_m else "0"
-    return (f"https://docs.google.com/spreadsheets/d/{sheet_id}"
-            f"/export?format=csv&gid={gid}")
+    base = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+    # Only pin gid if the user explicitly pointed at a tab. Without gid,
+    # Google exports the first tab — works regardless of its internal ID.
+    return f"{base}&gid={gid_m.group(1)}" if gid_m else base
 
 
 def _is_active(val: str) -> bool:
