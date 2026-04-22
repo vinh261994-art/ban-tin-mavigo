@@ -85,18 +85,6 @@
         }
       ]
     },
-    "cozyurbannest?_trksid=p4429486.m3561.l161211": {
-      "platform": "ebay",
-      "url": "https://www.ebay.com/str/cozyurbannest?_trksid=p4429486.m3561.l161211",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 262,
-          "delta": null,
-          "error": null
-        }
-      ]
-    },
     "tranis5": {
       "platform": "ebay",
       "url": "https://www.ebay.com/usr/tranis5",
@@ -121,18 +109,6 @@
         }
       ]
     },
-    "i.html?sid=teresafa-58&_pgn=1&isRefine=true&_trksid=p4429486.m2548.l49496": {
-      "platform": "ebay",
-      "url": "https://www.ebay.com/sch/i.html?sid=teresafa-58&_pgn=1&isRefine=true&_trksid=p4429486.m2548.l49496",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 467,
-          "delta": null,
-          "error": null
-        }
-      ]
-    },
     "hublou_25": {
       "platform": "ebay",
       "url": "https://www.ebay.com/usr/hublou_25",
@@ -153,78 +129,6 @@
           "date": "2026-04-22",
           "total_sales": 469,
           "delta": 2,
-          "error": null
-        }
-      ]
-    },
-    "pineappleandlove.etsy.com": {
-      "platform": "etsy",
-      "url": "https://pineappleandlove.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": null,
-          "error": "network: ReadTimeout"
-        }
-      ]
-    },
-    "cngbycng.etsy.com": {
-      "platform": "etsy",
-      "url": "https://cngbycng.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 1,
-          "delta": null,
-          "error": null
-        }
-      ]
-    },
-    "suirhana.etsy.com": {
-      "platform": "etsy",
-      "url": "https://suirhana.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": null,
-          "error": "network: ReadTimeout"
-        }
-      ]
-    },
-    "diepthanhboutique.etsy.com": {
-      "platform": "etsy",
-      "url": "https://diepthanhboutique.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": null,
-          "error": "network: ReadTimeout"
-        }
-      ]
-    },
-    "dastarco.etsy.com": {
-      "platform": "etsy",
-      "url": "https://dastarco.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 0,
-          "delta": null,
-          "error": "network: ReadTimeout"
-        }
-      ]
-    },
-    "magicmoonsh.etsy.com": {
-      "platform": "etsy",
-      "url": "https://magicmoonsh.etsy.com",
-      "snapshots": [
-        {
-          "date": "2026-04-22",
-          "total_sales": 2,
-          "delta": null,
           "error": null
         }
       ]
