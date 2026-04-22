@@ -59,47 +59,47 @@ class Snapshot:
     error: Optional[str] = None   # set if scrape/parse failed this run
 
 
-SCRAPFLY_API_KEY = (os.environ.get("SCRAPFLY_API_KEY") or "").strip()
+SCRAPINGBEE_API_KEY = (os.environ.get("SCRAPINGBEE_API_KEY") or "").strip()
 
 
 class _ScrapeError(RuntimeError):
     """Raised when the proxy returns a non-2xx target status."""
 
 
-def _fetch_scrapfly(url: str, platform: str | None) -> str:
-    """Fetch via Scrapfly API. Returns target HTML.
+def _fetch_scrapingbee(url: str, platform: str | None) -> str:
+    """Fetch via ScrapingBee API. Returns target HTML.
 
-    Credits:
-      eBay → default pool, 1 credit/call.
-      Etsy → asp=true (Anti Scraping Protection uses residential pool +
-             smart retry), ~5 credits/call. Essential because Etsy blocks
-             datacenter IPs with 403/500.
+    Credits (render_js=false saves ~5x):
+      eBay → classic proxy, 1 credit/call.
+      Etsy → premium_proxy=true (residential pool, bypass datacenter blocks),
+             10 credits/call. Essential because Etsy 403/500 on cloud IPs.
     """
-    from urllib.parse import quote
-    params = [
-        f"key={SCRAPFLY_API_KEY}",
-        "country=us",
-        f"url={quote(url, safe='')}",
-    ]
+    from urllib.parse import urlencode
+    params = {
+        "api_key": SCRAPINGBEE_API_KEY,
+        "url": url,
+        "render_js": "false",
+        "country_code": "us",
+    }
     if platform == "etsy":
-        params.append("asp=true")
-    api_url = f"https://api.scrapfly.io/scrape?{'&'.join(params)}"
-    # Residential pool can take 30–60s
-    t = 120.0 if platform == "etsy" else 70.0
+        params["premium_proxy"] = "true"
+    api_url = f"https://app.scrapingbee.com/api/v1/?{urlencode(params)}"
+    # Premium proxy can take 30–60s
+    t = 90.0 if platform == "etsy" else 45.0
     with httpx.Client(timeout=t, follow_redirects=True) as client:
         r = client.get(api_url)
-        r.raise_for_status()
-    data = r.json()
-    result = data.get("result") or {}
-    target_status = int(result.get("status_code") or 0)
-    if target_status >= 400:
-        raise _ScrapeError(f"HTTP {target_status}")
-    return result.get("content") or ""
+    if r.status_code >= 400:
+        # Spb-original-status-code header carries target's status when available
+        target_status = r.headers.get("Spb-original-status-code", "")
+        if target_status:
+            raise _ScrapeError(f"HTTP {target_status}")
+        raise _ScrapeError(f"API HTTP {r.status_code}")
+    return r.text
 
 
 def _fetch(url: str, platform: str | None = None, timeout: float = 25.0) -> str:
-    if SCRAPFLY_API_KEY:
-        return _fetch_scrapfly(url, platform)
+    if SCRAPINGBEE_API_KEY:
+        return _fetch_scrapingbee(url, platform)
     # Direct fetch — used for local dev; will 403 on GHA IP for Etsy
     headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
     with httpx.Client(timeout=timeout, follow_redirects=True, headers=headers) as client:
@@ -227,7 +227,7 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
     history = load_history()
     shop_map = history.setdefault("shops", {})
 
-    mode = "via Scrapfly" if SCRAPFLY_API_KEY else "direct"
+    mode = "via ScrapingBee" if SCRAPINGBEE_API_KEY else "direct"
     print(f"[shop_tracker] {today} · scraping {len(shops)} shops ({mode})")
 
     for i, shop in enumerate(shops, 1):

@@ -53,7 +53,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SHOPS_SHEET_URL: ${{ secrets.SHOPS_SHEET_URL }}
-          SCRAPFLY_API_KEY: ${{ secrets.SCRAPFLY_API_KEY }}
+          SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
           PYTHONIOENCODING: utf-8
         run: python scripts/daily_report.py
 
