@@ -62,26 +62,35 @@ class Snapshot:
 SCRAPER_API_KEY = (os.environ.get("SCRAPER_API_KEY") or "").strip()
 
 
-def _wrap_url(url: str) -> str:
-    """Route target URL through ScraperAPI when the key is set. This bypasses
-    the GHA IP block on Etsy (403) and eBay bot-detection. Free tier gives
-    1000 req/month — plenty for daily+weekly on ~10 shops."""
+def _wrap_url(url: str, platform: str | None = None) -> str:
+    """Route target URL through ScraperAPI when the key is set.
+
+    eBay: default proxy (1 credit/call) is enough.
+    Etsy: datacenter IPs get HTTP 500 — need premium residential pool
+          (10 credits/call). Budget ~3 Etsy shops × 30 days × 10 = 900,
+          still fits 1000/month free tier.
+    """
     if not SCRAPER_API_KEY:
         return url
     from urllib.parse import quote
-    return (
-        f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}"
-        f"&country_code=us&url={quote(url, safe='')}"
-    )
+    params = [
+        f"api_key={SCRAPER_API_KEY}",
+        "country_code=us",
+        f"url={quote(url, safe='')}",
+    ]
+    if platform == "etsy":
+        params.append("premium=true")
+    return f"http://api.scraperapi.com?{'&'.join(params)}"
 
 
-def _fetch(url: str, timeout: float = 25.0) -> str:
+def _fetch(url: str, platform: str | None = None, timeout: float = 25.0) -> str:
     if SCRAPER_API_KEY:
         # ScraperAPI handles UA/IP rotation itself; passing our headers can
         # confuse it. Also proxy round-trip is slower, bump timeout.
-        fetch_url = _wrap_url(url)
+        fetch_url = _wrap_url(url, platform)
         headers: dict = {}
-        t = 70.0
+        # Premium residential pool can take 30-60s per request
+        t = 90.0 if platform == "etsy" else 70.0
     else:
         fetch_url = url
         headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
@@ -139,7 +148,7 @@ def parse_ebay_sales(html: str) -> Optional[int]:
 def scrape_shop(platform: str, url: str) -> tuple[Optional[int], Optional[str]]:
     """Returns (total_sales, error_msg). One of them is None."""
     try:
-        html = _fetch(url)
+        html = _fetch(url, platform=platform)
     except httpx.HTTPStatusError as e:
         return None, f"HTTP {e.response.status_code}"
     except httpx.TransportError as e:
