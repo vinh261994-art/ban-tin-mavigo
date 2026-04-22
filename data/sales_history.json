@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T08:02:09+00:00",
+  "last_updated": "2026-04-22T08:17:09+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -15,7 +15,7 @@
           "date": "2026-04-22",
           "total_sales": 1,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": null
         }
       ]
     },
@@ -57,7 +57,7 @@
           "date": "2026-04-22",
           "total_sales": 4,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -165,7 +165,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": "network: ReadTimeout"
         }
       ]
     },
@@ -175,9 +175,9 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 0,
+          "total_sales": 1,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": null
         }
       ]
     },
@@ -189,7 +189,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": "network: ReadTimeout"
         }
       ]
     },
@@ -201,7 +201,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": "network: ReadTimeout"
         }
       ]
     },
@@ -213,7 +213,7 @@
           "date": "2026-04-22",
           "total_sales": 0,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": "network: ReadTimeout"
         }
       ]
     },
@@ -223,9 +223,9 @@
       "snapshots": [
         {
           "date": "2026-04-22",
-          "total_sales": 0,
+          "total_sales": 2,
           "delta": null,
-          "error": "API HTTP 500"
+          "error": null
         }
       ]
     }
