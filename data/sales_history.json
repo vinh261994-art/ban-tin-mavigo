@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-22T03:19:48+00:00",
+  "last_updated": "2026-04-22T04:05:44+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -13,15 +13,15 @@
         },
         {
           "date": "2026-04-22",
-          "total_sales": 0,
+          "total_sales": 1,
           "delta": null,
-          "error": "HTTP 403"
+          "error": null
         }
       ]
     },
     "stephanie9121": {
       "platform": "ebay",
-      "url": "https://www.ebay.com/str/stephanie9121",
+      "url": "https://www.ebay.com/usr/stephanie9121",
       "snapshots": [
         {
           "date": "2026-04-21",
@@ -33,6 +33,102 @@
           "date": "2026-04-22",
           "total_sales": 8,
           "delta": 0,
+          "error": null
+        }
+      ]
+    },
+    "step-6374": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/step-6374",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 15,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "riveratama-86": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/riveratama-86",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 4,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "quintae_54": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/quintae_54",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 10,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "sie374867": {
+      "platform": "ebay",
+      "url": "https://www.ebay.co.uk/usr/sie374867",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        }
+      ]
+    },
+    "cozyurbannest?_trksid=p4429486.m3561.l161211": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/str/cozyurbannest?_trksid=p4429486.m3561.l161211",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 262,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "tranis5": {
+      "platform": "ebay",
+      "url": "ebay.com/usr/tranis5",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 455,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "apar-518031": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/apar-518031",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 110,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "i.html?sid=teresafa-58&_pgn=1&isRefine=true&_trksid=p4429486.m2548.l49496": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/sch/i.html?sid=teresafa-58&_pgn=1&isRefine=true&_trksid=p4429486.m2548.l49496",
+      "snapshots": [
+        {
+          "date": "2026-04-22",
+          "total_sales": 467,
+          "delta": null,
           "error": null
         }
       ]
