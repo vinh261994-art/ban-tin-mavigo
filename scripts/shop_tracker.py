@@ -71,8 +71,8 @@ def _fetch_scrapingbee(url: str, platform: str | None) -> str:
 
     Credits (render_js=false saves ~5x):
       eBay → classic proxy, 1 credit/call.
-      Etsy → premium_proxy=true (residential pool, bypass datacenter blocks),
-             10 credits/call. Essential because Etsy 403/500 on cloud IPs.
+      Etsy → stealth_proxy=true (only mode that bypasses Akamai bot
+             challenge), 75 credits/call. Premium proxy alone returns 403.
     """
     from urllib.parse import urlencode
     params = {
@@ -82,7 +82,7 @@ def _fetch_scrapingbee(url: str, platform: str | None) -> str:
         "country_code": "us",
     }
     if platform == "etsy":
-        params["premium_proxy"] = "true"
+        params["stealth_proxy"] = "true"
     api_url = f"https://app.scrapingbee.com/api/v1/?{urlencode(params)}"
     # Premium proxy can take 30–60s
     t = 90.0 if platform == "etsy" else 45.0
