@@ -147,12 +147,9 @@ def parse_ebay_sales(html: str) -> Optional[int]:
     m = EBAY_SOLD_PATTERN_FALLBACK.search(html)
     if m:
         return int(m.group(1).replace(",", ""))
-    # Page rendered normally but no sold widget → inactive/new seller with 0 sales.
-    # PRESENCE_INFORMATION_MODULE is present on every valid profile/store page,
-    # so its existence means the fetch succeeded; its absence means something
-    # else (bot block, redirect, etc.) — leave as parse failure in that case.
-    if "PRESENCE_INFORMATION_MODULE" in html:
-        return 0
+    # Tried a PRESENCE_INFORMATION_MODULE-based "assume 0" fallback for
+    # new/inactive sellers — it silently zeroed out shops whose ScrapingBee
+    # response happened to be a partial render. Safer: let it fail loudly.
     return None
 
 
