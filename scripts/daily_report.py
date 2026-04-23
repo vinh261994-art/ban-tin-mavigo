@@ -217,7 +217,8 @@ def _format_shop_section(history: dict) -> str:
         return ("💰 <b>SALE 24H QUA</b>\n"
                 "  Chưa có dữ liệu — script chạy lần đầu, mai mới có delta mà mỉa mai.")
 
-    errors = [r for r in rows if r["error"]]
+    # Inactive shops = tồn tại nhưng chưa bao giờ bán. Không tính là lỗi scrape.
+    errors = [r for r in rows if r["error"] and "inactive" not in r["error"].lower()]
     with_delta = [r for r in rows if r["delta"] is not None]
     first_run = [r for r in rows if r["delta"] is None and not r["error"]]
 
@@ -263,7 +264,11 @@ def _format_shop_section(history: dict) -> str:
     for r in sorted(rows, key=lambda x: (x["platform"], x["name"].lower())):
         tag = f"[{r['platform']}]"
         if r["error"]:
-            lines.append(f"    • {tag} <b>{r['name']}</b> — ⚠ {r['error']}")
+            # Inactive = shop tồn tại nhưng chưa bán — render nhẹ hơn lỗi scrape
+            if "inactive" in r["error"].lower():
+                lines.append(f"    • {tag} <b>{r['name']}</b> — 💤 chưa có giao dịch")
+            else:
+                lines.append(f"    • {tag} <b>{r['name']}</b> — ⚠ {r['error']}")
         elif r["delta"] is None:
             lines.append(f"    • {tag} <b>{r['name']}</b> — total {r['total']} (mới)")
         else:

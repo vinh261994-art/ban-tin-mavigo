@@ -138,6 +138,15 @@ EBAY_SOLD_PATTERN = re.compile(
 # Fallback — simpler text proximity search
 EBAY_SOLD_PATTERN_FALLBACK = re.compile(r'([\d,]+)\s*items sold', re.IGNORECASE)
 
+# Inactive-seller markers — present on /usr/ pages that rendered fully but have
+# no items-sold widget because the account has never sold (sie374867 case).
+EBAY_INACTIVE_MARKERS = (
+    "No active listings",
+    "0 Followers",
+    '"totalFeedback":0',
+    '"totalFeedback":"0"',
+)
+
 
 def parse_ebay_sales(html: str) -> Optional[int]:
     m = EBAY_SOLD_PATTERN.search(html)
@@ -147,35 +156,63 @@ def parse_ebay_sales(html: str) -> Optional[int]:
     m = EBAY_SOLD_PATTERN_FALLBACK.search(html)
     if m:
         return int(m.group(1).replace(",", ""))
-    # Tried a PRESENCE_INFORMATION_MODULE-based "assume 0" fallback for
-    # new/inactive sellers — it silently zeroed out shops whose ScrapingBee
-    # response happened to be a partial render. Safer: let it fail loudly.
     return None
+
+
+def is_ebay_inactive(html: str) -> bool:
+    """True if page rendered fully but seller has no sales history.
+
+    Only returns true when we see BOTH the core profile module (proves render
+    is complete) AND at least one inactive-seller signal — otherwise a partial
+    render would be misclassified as 0 sales.
+    """
+    if "PRESENCE_INFORMATION_MODULE" not in html and "profileModule" not in html:
+        return False
+    return any(m in html for m in EBAY_INACTIVE_MARKERS)
 
 
 # ---------- Shop tracking flow ----------
 
-def scrape_shop(platform: str, url: str) -> tuple[Optional[int], Optional[str]]:
-    """Returns (total_sales, error_msg). One of them is None."""
+def _scrape_once(platform: str, url: str) -> tuple[Optional[int], Optional[str], str]:
+    """Single attempt. Returns (total, err, html) — html is empty on fetch fail."""
     try:
         html = _fetch(url, platform=platform)
     except _ScrapeError as e:
-        return None, str(e)
+        return None, str(e), ""
     except httpx.HTTPStatusError as e:
-        return None, f"proxy HTTP {e.response.status_code}"
+        return None, f"proxy HTTP {e.response.status_code}", ""
     except httpx.TransportError as e:
-        return None, f"network: {type(e).__name__}"
+        return None, f"network: {type(e).__name__}", ""
 
     if platform == "etsy":
         total = parse_etsy_sales(html)
     elif platform == "ebay":
         total = parse_ebay_sales(html)
     else:
-        return None, f"unknown platform: {platform}"
+        return None, f"unknown platform: {platform}", html
 
     if total is None:
-        return None, "parse failed (selector may have changed)"
-    return total, None
+        return None, "parse failed (selector may have changed)", html
+    return total, None, html
+
+
+def scrape_shop(platform: str, url: str) -> tuple[Optional[int], Optional[str]]:
+    """Returns (total_sales, error_msg). One of them is None.
+
+    Retries once on parse failure — ScrapingBee classic proxy occasionally
+    returns partial renders that miss the items-sold widget. Inactive eBay
+    sellers (no sold data at all) are reported as 0 with a distinct error tag
+    so the bulletin can render them softly instead of as a scrape failure.
+    """
+    total, err, html = _scrape_once(platform, url)
+    if total is None and err and "parse failed" in err:
+        if platform == "ebay" and is_ebay_inactive(html):
+            return 0, "inactive (no sold data)"
+        time.sleep(2.0)
+        total, err, html = _scrape_once(platform, url)
+        if total is None and platform == "ebay" and is_ebay_inactive(html):
+            return 0, "inactive (no sold data)"
+    return total, err
 
 
 def load_history() -> dict:
@@ -263,6 +300,15 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
             err = snap_data["error"] if snap_data["error"] else (
                 None if total is not None else "missing total in sheet")
             used_sheet = True
+            # Apps Script got rate-limited by Etsy (happens on some shops) —
+            # fall back to ScrapingBee stealth. Different IP egress often works.
+            if err and ("429" in err or "403" in err) and SCRAPINGBEE_API_KEY:
+                print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} "
+                      f"sheet lỗi '{err}' — thử ScrapingBee")
+                sb_total, sb_err = scrape_shop(shop["platform"], shop["url"])
+                if sb_err is None:
+                    total, err = sb_total, None
+                    used_sheet = False
         else:
             total, err = scrape_shop(shop["platform"], shop["url"])
 
