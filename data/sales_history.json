@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-23T03:34:05+00:00",
+  "last_updated": "2026-04-23T03:45:04+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -19,9 +19,9 @@
         },
         {
           "date": "2026-04-23",
-          "total_sales": 0,
+          "total_sales": 1,
           "delta": null,
-          "error": "ERR 429"
+          "error": null
         }
       ]
     },
@@ -81,7 +81,7 @@
           "date": "2026-04-23",
           "total_sales": 4,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -135,7 +135,7 @@
           "date": "2026-04-23",
           "total_sales": 455,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -153,7 +153,7 @@
           "date": "2026-04-23",
           "total_sales": 112,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": null
         }
       ]
     },
@@ -206,7 +206,7 @@
         {
           "date": "2026-04-23",
           "total_sales": 435,
-          "delta": 7,
+          "delta": 0,
           "error": null
         }
       ]
@@ -259,9 +259,9 @@
         },
         {
           "date": "2026-04-23",
-          "total_sales": 236,
+          "total_sales": 238,
           "delta": null,
-          "error": "ERR 429"
+          "error": null
         }
       ]
     },
@@ -297,7 +297,7 @@
           "date": "2026-04-23",
           "total_sales": 2,
           "delta": null,
-          "error": "ERR 429"
+          "error": null
         }
       ]
     }
