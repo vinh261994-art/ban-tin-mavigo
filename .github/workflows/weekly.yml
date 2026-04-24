@@ -19,8 +19,12 @@ name: Weekly Deep Report
 
 on:
   schedule:
-    # 02:00 UTC Monday = 09:00 VN Monday
-    - cron: "0 2 * * 1"
+    # Multiple Monday-morning fires; run_lock dedup ensures only one bulletin
+    # per ISO week actually sends to Telegram.
+    - cron: "0 2 * * 1"    # 09:00 VN Monday
+    - cron: "30 2 * * 1"   # 09:30 VN Monday (backup)
+    - cron: "0 3 * * 1"    # 10:00 VN Monday (backup)
+    - cron: "30 3 * * 1"   # 10:30 VN Monday (backup)
   workflow_dispatch: {}
 
 concurrency:

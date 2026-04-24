@@ -20,8 +20,13 @@ name: Daily Brief
 
 on:
   schedule:
-    # 01:00 UTC = 08:00 VN (UTC+7)
-    - cron: "0 1 * * *"
+    # GitHub Actions cron is unreliable (can skip/delay 15-60min). We fire
+    # multiple times in the morning window; run_lock dedup ensures Telegram
+    # only receives one bulletin per UTC day.
+    - cron: "0 1 * * *"    # 08:00 VN
+    - cron: "30 1 * * *"   # 08:30 VN (backup)
+    - cron: "0 2 * * *"    # 09:00 VN (backup)
+    - cron: "30 2 * * *"   # 09:30 VN (backup)
   workflow_dispatch: {}   # enable manual trigger
 
 concurrency:

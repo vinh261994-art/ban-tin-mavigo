@@ -27,6 +27,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 import holiday_advisor
 import keyword_tracker
+import run_lock
 import telegram_sender
 import ytrends_analytics as yta
 from gemini_client import GeminiError, generate as gemini_generate
@@ -525,7 +526,11 @@ def build_and_send() -> None:
 
 
 def main() -> None:
+    if run_lock.already_sent("weekly"):
+        print("[weekly_report] already sent this ISO week — skipping (use FORCE_SEND=1 to override)")
+        return
     build_and_send()
+    run_lock.mark_sent("weekly")
 
 
 if __name__ == "__main__":

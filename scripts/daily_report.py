@@ -27,6 +27,7 @@ if hasattr(sys.stdout, "reconfigure"):
 import shop_tracker
 import holiday_advisor
 import keyword_tracker
+import run_lock
 import telegram_sender
 import ytrends_analytics as yta
 
@@ -546,11 +547,15 @@ def build_report() -> tuple[str, list[dict]]:
 
 
 def main() -> None:
+    if run_lock.already_sent("daily"):
+        print("[daily_report] already sent today — skipping (use FORCE_SEND=1 to override)")
+        return
     text, album = build_report()
     telegram_sender.send(text)
     if album:
         print(f"[daily_report] sending hot album ({len(album)} photos)")
         telegram_sender.send_media_group(album)
+    run_lock.mark_sent("daily")
 
 
 if __name__ == "__main__":
