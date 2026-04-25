@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-25T03:00:05+00:00",
+  "last_updated": "2026-04-25T03:12:38+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -67,9 +67,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 9,
+          "total_sales": 11,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -97,9 +97,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 15,
+          "total_sales": 16,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -127,9 +127,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 4,
+          "total_sales": 6,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -157,9 +157,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 10,
+          "total_sales": 12,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -189,7 +189,7 @@
           "date": "2026-04-25",
           "total_sales": 0,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": "parse failed (selector may have changed)"
         }
       ]
     },
@@ -217,9 +217,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 456,
+          "total_sales": 460,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -247,9 +247,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 117,
+          "total_sales": 124,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -279,7 +279,7 @@
           "date": "2026-04-25",
           "total_sales": 262,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
@@ -307,9 +307,9 @@
         },
         {
           "date": "2026-04-25",
-          "total_sales": 471,
+          "total_sales": 477,
           "delta": null,
-          "error": "API HTTP 401"
+          "error": null
         }
       ]
     },
