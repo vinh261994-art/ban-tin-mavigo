@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-24T03:32:14+00:00",
+  "last_updated": "2026-04-25T02:49:54+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -26,6 +26,12 @@
         {
           "date": "2026-04-24",
           "total_sales": 2,
+          "delta": 1,
+          "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 3,
           "delta": 1,
           "error": null
         }
@@ -58,6 +64,12 @@
           "total_sales": 9,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 9,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -82,6 +94,12 @@
           "total_sales": 15,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 15,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -106,6 +124,12 @@
           "total_sales": 4,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 4,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -130,6 +154,12 @@
           "total_sales": 10,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 10,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -154,6 +184,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "parse failed (selector may have changed)"
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 0,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -178,6 +214,12 @@
           "total_sales": 456,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 456,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -202,6 +244,12 @@
           "total_sales": 117,
           "delta": 5,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 117,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -226,6 +274,12 @@
           "total_sales": 262,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 262,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -250,6 +304,12 @@
           "total_sales": 471,
           "delta": 2,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 471,
+          "delta": null,
+          "error": "API HTTP 401"
         }
       ]
     },
@@ -273,6 +333,12 @@
           "date": "2026-04-24",
           "total_sales": 452,
           "delta": 17,
+          "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 460,
+          "delta": 8,
           "error": null
         }
       ]
@@ -298,6 +364,12 @@
           "total_sales": 2,
           "delta": 2,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 3,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -319,6 +391,12 @@
         },
         {
           "date": "2026-04-24",
+          "total_sales": 65,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-04-25",
           "total_sales": 65,
           "delta": 0,
           "error": null
@@ -346,6 +424,12 @@
           "total_sales": 239,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 241,
+          "delta": 2,
+          "error": null
         }
       ]
     },
@@ -369,6 +453,12 @@
           "date": "2026-04-24",
           "total_sales": 303,
           "delta": 6,
+          "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 310,
+          "delta": 7,
           "error": null
         }
       ]
@@ -394,6 +484,12 @@
           "total_sales": 2,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-04-25",
+          "total_sales": 2,
+          "delta": null,
+          "error": "ERR 429"
         }
       ]
     }
