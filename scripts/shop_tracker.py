@@ -99,15 +99,29 @@ def _fetch_scrapingbee(url: str, platform: str | None) -> str:
     return r.text
 
 
-def _fetch(url: str, platform: str | None = None, timeout: float = 25.0) -> str:
-    if SCRAPINGBEE_API_KEY:
-        return _fetch_scrapingbee(url, platform)
-    # Direct fetch — used for local dev; will 403 on GHA IP for Etsy
+def _fetch_direct(url: str, timeout: float = 25.0) -> str:
     headers = {**HEADERS_BASE, "User-Agent": random.choice(USER_AGENTS)}
     with httpx.Client(timeout=timeout, follow_redirects=True, headers=headers) as client:
         r = client.get(url)
         r.raise_for_status()
         return r.text
+
+
+def _fetch(url: str, platform: str | None = None, timeout: float = 25.0) -> str:
+    # eBay seller pages (/usr/) are public and load fine from GH Actions US IP
+    # without a proxy. Try direct first to save ScrapingBee credits; fall back
+    # to ScrapingBee only when direct fails (rate-limit, region block, etc.).
+    if platform == "ebay":
+        try:
+            return _fetch_direct(url, timeout=timeout)
+        except Exception as e:
+            if not SCRAPINGBEE_API_KEY:
+                raise
+            print(f"[ebay] direct fetch failed ({e}) — fallback ScrapingBee")
+            return _fetch_scrapingbee(url, platform)
+    if SCRAPINGBEE_API_KEY:
+        return _fetch_scrapingbee(url, platform)
+    return _fetch_direct(url, timeout=timeout)
 
 
 # ---------- Etsy parsers ----------
@@ -296,21 +310,17 @@ def run(delay_range: tuple[float, float] = (3.0, 6.0)) -> dict:
         key = shop["name"]
         used_sheet = False
 
-        if shop["platform"] == "etsy" and key in etsy_sales:
-            snap_data = etsy_sales[key]
-            total = snap_data["total_sales"]
-            err = snap_data["error"] if snap_data["error"] else (
-                None if total is not None else "missing total in sheet")
+        if shop["platform"] == "etsy":
+            # Etsy luôn đọc từ Sheet Data tab — không scrape live (ScrapingBee
+            # stealth tốn 75 credit/call, không đáng cho dữ liệu daily).
+            if key in etsy_sales:
+                snap_data = etsy_sales[key]
+                total = snap_data["total_sales"]
+                err = snap_data["error"] if snap_data["error"] else (
+                    None if total is not None else "missing total in sheet")
+            else:
+                total, err = None, "missing from sheet Data tab"
             used_sheet = True
-            # Apps Script got rate-limited by Etsy (happens on some shops) —
-            # fall back to ScrapingBee stealth. Different IP egress often works.
-            if err and ("429" in err or "403" in err) and SCRAPINGBEE_API_KEY:
-                print(f"  [{i:2}/{len(shops)}] {shop['platform']:5} {key:25} "
-                      f"sheet lỗi '{err}' — thử ScrapingBee")
-                sb_total, sb_err = scrape_shop(shop["platform"], shop["url"])
-                if sb_err is None:
-                    total, err = sb_total, None
-                    used_sheet = False
         else:
             total, err = scrape_shop(shop["platform"], shop["url"])
 
