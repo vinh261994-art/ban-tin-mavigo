@@ -93,6 +93,8 @@ def _fetch_scrapingbee(url: str, platform: str | None) -> str:
         target_status = r.headers.get("Spb-original-status-code", "")
         if target_status:
             raise _ScrapeError(f"HTTP {target_status}")
+        body_snippet = (r.text or "")[:200].replace("\n", " ")
+        print(f"[scrapingbee] {r.status_code} body={body_snippet!r}")
         raise _ScrapeError(f"API HTTP {r.status_code}")
     return r.text
 
