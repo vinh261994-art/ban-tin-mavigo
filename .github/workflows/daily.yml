@@ -27,7 +27,12 @@ on:
     - cron: "30 1 * * *"   # 08:30 VN (backup)
     - cron: "0 2 * * *"    # 09:00 VN (backup)
     - cron: "30 2 * * *"   # 09:30 VN (backup)
-  workflow_dispatch: {}   # enable manual trigger
+  workflow_dispatch:
+    inputs:
+      force_send:
+        description: "Bypass dedup (re-send today's bulletin)"
+        type: boolean
+        default: false
 
 concurrency:
   group: mavigo-daily
@@ -59,6 +64,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SHOPS_SHEET_URL: ${{ secrets.SHOPS_SHEET_URL }}
           SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
+          FORCE_SEND: ${{ inputs.force_send && '1' || '' }}
           PYTHONIOENCODING: utf-8
         run: python scripts/daily_report.py
 
