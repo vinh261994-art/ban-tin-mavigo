@@ -58,7 +58,6 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SHOPS_SHEET_URL: ${{ secrets.SHOPS_SHEET_URL }}
-          SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
           PYTHONIOENCODING: utf-8
         run: python scripts/weekly_report.py
 

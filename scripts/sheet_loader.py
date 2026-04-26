@@ -125,10 +125,12 @@ def _parse_int(v: str) -> int | None:
         return None
 
 
-def load_etsy_sales(sheet_url: str, timeout: float = 20.0) -> dict[str, dict]:
-    """Read the `Data` tab written by Apps Script → latest snapshot per Etsy shop.
+def load_sales(sheet_url: str, timeout: float = 20.0) -> dict[str, dict]:
+    """Read the `Data` tab written by Apps Script → latest snapshot per shop.
 
-    Data columns: Shop | Date | Sales_Total | Sales_Daily | ... | Fetch_Status | ...
+    Returns one entry per shop name regardless of platform — Apps Script writes
+    Etsy and eBay rows to the same tab using the same schema:
+        Shop | Date | Sales_Total | Sales_Daily | ... | Fetch_Status | ...
 
     Returns dict keyed by stripped shop name:
         {"date": "YYYY-MM-DD", "total_sales": int | None,
@@ -164,8 +166,12 @@ def load_etsy_sales(sheet_url: str, timeout: float = 20.0) -> dict[str, dict]:
             "error": err,
         }
 
-    print(f"[sheet_loader] loaded sales for {len(latest)} etsy shop từ tab Data")
+    print(f"[sheet_loader] loaded sales for {len(latest)} shop từ tab Data")
     return latest
+
+
+# Backward-compat alias — older callers still import load_etsy_sales
+load_etsy_sales = load_sales
 
 
 def load_keywords(sheet_url: str, timeout: float = 20.0) -> list[str]:
@@ -224,10 +230,10 @@ if __name__ == "__main__":
             print(f"  {kw}")
     except Exception as e:
         print(f"  (load_keywords: {type(e).__name__}: {e})")
-    print("\n--- etsy sales (from Data tab) ---")
+    print("\n--- sales (from Data tab) ---")
     try:
-        for shop, snap in load_etsy_sales(url).items():
+        for shop, snap in load_sales(url).items():
             print(f"  {shop:25} {snap['date']} total={snap['total_sales']} "
                   f"delta={snap['delta']} err={snap['error']}")
     except Exception as e:
-        print(f"  (load_etsy_sales: {type(e).__name__}: {e})")
+        print(f"  (load_sales: {type(e).__name__}: {e})")

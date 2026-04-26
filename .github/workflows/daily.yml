@@ -65,7 +65,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SHOPS_SHEET_URL: ${{ secrets.SHOPS_SHEET_URL }}
-          SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
           FORCE_SEND: ${{ inputs.force_send && '1' || '' }}
           PYTHONIOENCODING: utf-8
         run: python scripts/daily_report.py
