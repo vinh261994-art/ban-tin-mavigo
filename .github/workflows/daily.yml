@@ -20,13 +20,15 @@ name: Daily Brief
 
 on:
   schedule:
-    # GitHub Actions cron is unreliable (can skip/delay 15-60min). We fire
-    # multiple times in the morning window; run_lock dedup ensures Telegram
-    # only receives one bulletin per UTC day.
-    - cron: "0 1 * * *"    # 08:00 VN
-    - cron: "30 1 * * *"   # 08:30 VN (backup)
-    - cron: "0 2 * * *"    # 09:00 VN (backup)
-    - cron: "30 2 * * *"   # 09:30 VN (backup)
+    # GitHub Actions skips cron at peak load — phút chẵn 0/15/30/45 ở 00-04 UTC
+    # bị bỏ qua nhiều nhất. Dùng phút lẻ + trải mỏng nhiều khung giờ.
+    # run_lock dedup đảm bảo chỉ 1 bản tin / UTC day tới Telegram.
+    - cron: "13 1 * * *"   # 08:13 VN
+    - cron: "37 1 * * *"   # 08:37 VN
+    - cron: "11 2 * * *"   # 09:11 VN
+    - cron: "43 3 * * *"   # 10:43 VN
+    - cron: "17 5 * * *"   # 12:17 VN (trưa, ngoài peak EU)
+    - cron: "29 9 * * *"   # 16:29 VN (chiều, off-peak)
   workflow_dispatch:
     inputs:
       force_send:

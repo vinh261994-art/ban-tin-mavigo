@@ -19,12 +19,13 @@ name: Weekly Deep Report
 
 on:
   schedule:
-    # Multiple Monday-morning fires; run_lock dedup ensures only one bulletin
-    # per ISO week actually sends to Telegram.
-    - cron: "0 2 * * 1"    # 09:00 VN Monday
-    - cron: "30 2 * * 1"   # 09:30 VN Monday (backup)
-    - cron: "0 3 * * 1"    # 10:00 VN Monday (backup)
-    - cron: "30 3 * * 1"   # 10:30 VN Monday (backup)
+    # Lệch phút lẻ + trải nhiều khung để tránh GitHub cron peak skip.
+    # run_lock dedup đảm bảo chỉ 1 bản tin / ISO week tới Telegram.
+    - cron: "19 2 * * 1"   # 09:19 VN Monday
+    - cron: "41 2 * * 1"   # 09:41 VN Monday
+    - cron: "13 3 * * 1"   # 10:13 VN Monday
+    - cron: "47 4 * * 1"   # 11:47 VN Monday
+    - cron: "23 7 * * 1"   # 14:23 VN Monday (off-peak)
   workflow_dispatch: {}
 
 concurrency:
