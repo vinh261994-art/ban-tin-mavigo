@@ -27,6 +27,48 @@
  *   Shop | URL | Active?  (Active để trống = active)
  */
 
+/**
+ * Debug helper: fetch 1 URL, in HTML stats để biết pattern thực tế eBay trả.
+ * Cách dùng: chọn function `debugEbayOne` ở dropdown → Run → mở Logger
+ * (View → Logs hoặc tab "Nhật ký thực thi"). Paste output cho dev.
+ */
+function debugEbayOne() {
+  const url = 'https://www.ebay.com/usr/stephanie9121';  // đổi URL nếu cần
+  const r = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    followRedirects: true,
+    headers: {
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    },
+  });
+  const html = r.getContentText();
+  Logger.log('URL: ' + url);
+  Logger.log('HTTP: ' + r.getResponseCode());
+  Logger.log('Length: ' + html.length);
+  Logger.log('Has "items sold": ' + (html.indexOf('items sold') !== -1));
+  Logger.log('Has "Items Sold": ' + (html.indexOf('Items Sold') !== -1));
+  Logger.log('Has "sold": count=' + (html.match(/sold/gi) || []).length);
+  Logger.log('Has "PRESENCE_INFORMATION_MODULE": ' + (html.indexOf('PRESENCE_INFORMATION_MODULE') !== -1));
+  Logger.log('Has "profileModule": ' + (html.indexOf('profileModule') !== -1));
+  Logger.log('Has "Robot or human": ' + (html.indexOf('Robot or human') !== -1));
+  Logger.log('Has "Pardon Our Interruption": ' + (html.indexOf('Pardon Our Interruption') !== -1));
+  Logger.log('Has "captcha": ' + (html.toLowerCase().indexOf('captcha') !== -1));
+
+  // In các đoạn 200 char xung quanh chữ "sold" đầu tiên (case-insensitive)
+  const lower = html.toLowerCase();
+  let i = lower.indexOf('sold'), printed = 0;
+  while (i !== -1 && printed < 5) {
+    const start = Math.max(0, i - 100);
+    const end = Math.min(html.length, i + 100);
+    Logger.log('  CTX[' + printed + '] @' + i + ': ...' + html.substring(start, end).replace(/\s+/g, ' ') + '...');
+    i = lower.indexOf('sold', i + 4);
+    printed++;
+  }
+  if (printed === 0) Logger.log('  KHÔNG có chữ "sold" trong HTML — chắc bị block/captcha');
+}
+
 function fetchEbayAll() {
   // ===== Config (local, không leak ra global) =====
   const TAB_SHOPS = 'shops_ebay';
