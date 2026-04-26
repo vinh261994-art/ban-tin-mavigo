@@ -74,7 +74,10 @@ function fetchEbayAll() {
   const TAB_SHOPS = 'shops_ebay';
   const TAB_DATA  = 'Data';
 
-  const PATTERN_PRIMARY = /"text"\s*:\s*"([\d,]+)"\s*,\s*"styles"\s*:\s*\["BOLD"\]\s*\}\s*,\s*\{\s*"_type"\s*:\s*"TextSpan"\s*,\s*"text"\s*:\s*"\s*items sold"/;
+  // eBay markup hiện tại (4/2026):
+  //   <span class="str-text-span BOLD">11</span><!--F#@1--> items sold
+  const PATTERN_PRIMARY = /BOLD">\s*([\d,]+)\s*<\/span>(?:<!--[^>]*-->|\s)*items sold/i;
+  // Fallback rộng — match số kề "items sold" (rủi ro: có thể bắt nhầm)
   const PATTERN_FALLBACK = /([\d,]+)\s*items sold/i;
   const INACTIVE_MARKERS = [
     'No active listings',
