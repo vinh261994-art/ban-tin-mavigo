@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-26T02:54:34+00:00",
+  "last_updated": "2026-04-26T03:04:27+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -80,8 +80,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 11,
-          "delta": 0,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -116,8 +116,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 18,
-          "delta": 2,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -152,8 +152,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 8,
-          "delta": 2,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -188,8 +188,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 13,
-          "delta": 1,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -225,7 +225,7 @@
           "date": "2026-04-26",
           "total_sales": 0,
           "delta": null,
-          "error": "parse failed (selector may have changed)"
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -260,8 +260,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 463,
-          "delta": 3,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -296,8 +296,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 132,
-          "delta": 8,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -332,8 +332,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 265,
-          "delta": 3,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -368,8 +368,8 @@
         {
           "date": "2026-04-26",
           "total_sales": 480,
-          "delta": 3,
-          "error": null
+          "delta": null,
+          "error": "missing from sheet Data tab"
         }
       ]
     },
@@ -404,7 +404,7 @@
         {
           "date": "2026-04-26",
           "total_sales": 467,
-          "delta": 7,
+          "delta": 0,
           "error": null
         }
       ]
@@ -440,7 +440,7 @@
         {
           "date": "2026-04-26",
           "total_sales": 4,
-          "delta": 1,
+          "delta": 0,
           "error": null
         }
       ]
@@ -512,7 +512,7 @@
         {
           "date": "2026-04-26",
           "total_sales": 245,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
@@ -548,7 +548,7 @@
         {
           "date": "2026-04-26",
           "total_sales": 317,
-          "delta": 7,
+          "delta": 0,
           "error": null
         }
       ]
@@ -584,7 +584,7 @@
         {
           "date": "2026-04-26",
           "total_sales": 2,
-          "delta": null,
+          "delta": 0,
           "error": null
         }
       ]
