@@ -1,4 +1,4 @@
-# PLAN — Bản Tin Mavigo
+# PLAN — Bản Tin Mavigo1
 
 Hệ thống tự động thu thập dữ liệu sale, trend, dịp lễ rồi gửi báo cáo Telegram cho team. Chạy trên GitHub Actions (miễn phí).
 
