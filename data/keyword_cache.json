@@ -1,18 +1,18 @@
 {
   "crochet": {
-    "cached_at": "2026-04-27T02:09:02+00:00",
+    "cached_at": "2026-04-28T02:13:54+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "spike",
-      "opportunity_score": 57.6,
+      "opportunity_score": 57.5,
       "competition": "high",
       "action": "competitive",
       "trend": "rising",
-      "trend_strength": 0.2849,
-      "revenue_change_pct": 454.08,
+      "trend_strength": 0.3446,
+      "revenue_change_pct": -74.09,
       "price_range": "5-20",
-      "total_listings": 2480,
-      "demand_supply_ratio": 0.16,
+      "total_listings": 2517,
+      "demand_supply_ratio": 0.14,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
       "top_shop_id": 42898103,
@@ -20,11 +20,11 @@
       "top_shop_revenue_usd": 37958.26,
       "top_shop_listings": 5,
       "top_shop_sample_listing_id": 4403665736,
-      "top_listing_id": 4396392848,
-      "top_listing_title": "Clover poncho crochet pattern *DIGITAL PDF*",
-      "top_listing_price_usd": 8.01,
-      "top_listing_total_sold": 2184,
-      "top_listing_revenue_usd": 13104.0
+      "top_listing_id": 4476799980,
+      "top_listing_title": "Crochet Earth Chain Pattern (PDF Pattern)",
+      "top_listing_price_usd": 3.47,
+      "top_listing_total_sold": 32,
+      "top_listing_revenue_usd": 158.4
     }
   }
 }
