@@ -1,30 +1,30 @@
 {
   "crochet": {
-    "cached_at": "2026-04-30T02:01:38+00:00",
+    "cached_at": "2026-05-01T02:01:29+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
-      "opportunity_score": 57.5,
+      "opportunity_score": 57.2,
       "competition": "high",
       "action": "competitive",
-      "trend": "declining",
-      "trend_strength": 0.2578,
-      "revenue_change_pct": 233.57,
+      "trend": "stable",
+      "trend_strength": 0.3053,
+      "revenue_change_pct": -33.08,
       "price_range": "5-20",
-      "total_listings": 2610,
-      "demand_supply_ratio": 0.14,
+      "total_listings": 2655,
+      "demand_supply_ratio": 0.12,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
-      "top_shop_id": 42898103,
-      "top_shop_country": "CA",
-      "top_shop_revenue_usd": 37958.26,
-      "top_shop_listings": 5,
-      "top_shop_sample_listing_id": 4403665736,
-      "top_listing_id": 4476799980,
-      "top_listing_title": "Crochet Earth Chain Pattern (PDF Pattern)",
-      "top_listing_price_usd": 3.47,
-      "top_listing_total_sold": 32,
-      "top_listing_revenue_usd": 158.4
+      "top_shop_id": 32081894,
+      "top_shop_country": "US",
+      "top_shop_revenue_usd": 57327.26,
+      "top_shop_listings": 7,
+      "top_shop_sample_listing_id": 0,
+      "top_listing_id": 4464104825,
+      "top_listing_title": "Popcorn Bucket Blanket Crochet Pattern PDF | Movie Night Basket + Matching Throw Blanket",
+      "top_listing_price_usd": 5.8,
+      "top_listing_total_sold": 54,
+      "top_listing_revenue_usd": 313.2
     }
   }
 }
