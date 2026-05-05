@@ -1,30 +1,30 @@
 {
   "crochet": {
-    "cached_at": "2026-05-04T02:01:37+00:00",
+    "cached_at": "2026-05-05T02:02:02+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "spike",
-      "opportunity_score": 57.5,
+      "opportunity_score": 57.4,
       "competition": "high",
       "action": "competitive",
       "trend": "rising",
-      "trend_strength": 0.4683,
-      "revenue_change_pct": -91.89,
+      "trend_strength": 0.3886,
+      "revenue_change_pct": 151.05,
       "price_range": "5-19.99",
-      "total_listings": 2759,
+      "total_listings": 2784,
       "demand_supply_ratio": 0.13,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
       "top_shop_id": 32081894,
       "top_shop_country": "US",
-      "top_shop_revenue_usd": 57327.26,
+      "top_shop_revenue_usd": 61381.16,
       "top_shop_listings": 7,
-      "top_shop_sample_listing_id": 0,
-      "top_listing_id": 4464104825,
-      "top_listing_title": "Popcorn Bucket Blanket Crochet Pattern PDF | Movie Night Basket + Matching Throw Blanket",
-      "top_listing_price_usd": 5.8,
-      "top_listing_total_sold": 54,
-      "top_listing_revenue_usd": 313.2
+      "top_shop_sample_listing_id": 4478184316,
+      "top_listing_id": 4478184316,
+      "top_listing_title": "Critterlings Ocean Adventure 24 Pack, Small No-Sew Crochet Patterns",
+      "top_listing_price_usd": 19.99,
+      "top_listing_total_sold": 551,
+      "top_listing_revenue_usd": 11014.49
     }
   }
 }

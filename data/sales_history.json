@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-04T02:01:22+00:00",
+  "last_updated": "2026-05-05T02:01:52+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -85,6 +85,12 @@
         },
         {
           "date": "2026-05-04",
+          "total_sales": 9,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-05",
           "total_sales": 9,
           "delta": 0,
           "error": null
@@ -178,6 +184,12 @@
           "total_sales": 17,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 17,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -262,6 +274,12 @@
           "total_sales": 35,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 35,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -344,6 +362,12 @@
         {
           "date": "2026-05-04",
           "total_sales": 14,
+          "delta": 1,
+          "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 15,
           "delta": 1,
           "error": null
         }
@@ -430,6 +454,12 @@
           "total_sales": 21,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 23,
+          "delta": 2,
+          "error": null
         }
       ]
     },
@@ -511,6 +541,12 @@
         },
         {
           "date": "2026-05-04",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        },
+        {
+          "date": "2026-05-05",
           "total_sales": 0,
           "delta": null,
           "error": "parse failed (selector may have changed)"
@@ -598,6 +634,12 @@
           "total_sales": 472,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 472,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -682,6 +724,12 @@
           "total_sales": 174,
           "delta": 2,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 174,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -763,6 +811,12 @@
         },
         {
           "date": "2026-05-04",
+          "total_sales": 268,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-05",
           "total_sales": 268,
           "delta": 0,
           "error": null
@@ -850,6 +904,12 @@
           "total_sales": 486,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 486,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -934,6 +994,12 @@
           "total_sales": 543,
           "delta": 7,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 558,
+          "delta": 15,
+          "error": null
         }
       ]
     },
@@ -1015,6 +1081,12 @@
         },
         {
           "date": "2026-05-04",
+          "total_sales": 7,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-05",
           "total_sales": 7,
           "delta": 0,
           "error": null
@@ -1102,6 +1174,12 @@
           "total_sales": 71,
           "delta": null,
           "error": "ERR 429"
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 72,
+          "delta": null,
+          "error": null
         }
       ]
     },
@@ -1185,6 +1263,12 @@
           "date": "2026-05-04",
           "total_sales": 265,
           "delta": 4,
+          "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 265,
+          "delta": 0,
           "error": null
         }
       ]
@@ -1270,6 +1354,12 @@
           "total_sales": 362,
           "delta": 5,
           "error": null
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 362,
+          "delta": null,
+          "error": "ERR 429"
         }
       ]
     },
@@ -1354,6 +1444,72 @@
           "total_sales": 2,
           "delta": null,
           "error": "ERR 429"
+        },
+        {
+          "date": "2026-05-05",
+          "total_sales": 2,
+          "delta": null,
+          "error": null
+        }
+      ]
+    },
+    "an-441909": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/an-441909",
+      "snapshots": [
+        {
+          "date": "2026-05-05",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        }
+      ]
+    },
+    "ghco2889": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/ghco2889",
+      "snapshots": [
+        {
+          "date": "2026-05-05",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        }
+      ]
+    },
+    "sh44635": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/sh44635",
+      "snapshots": [
+        {
+          "date": "2026-05-05",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        }
+      ]
+    },
+    "bec-6415": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/bec-6415",
+      "snapshots": [
+        {
+          "date": "2026-05-05",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        }
+      ]
+    },
+    "reb5802": {
+      "platform": "ebay",
+      "url": "https://www.ebay.com/usr/reb5802",
+      "snapshots": [
+        {
+          "date": "2026-05-05",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
         }
       ]
     }
