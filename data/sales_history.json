@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-25T02:01:43+00:00",
+  "last_updated": "2026-05-26T02:01:55+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -213,6 +213,12 @@
           "date": "2026-05-25",
           "total_sales": 17,
           "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 18,
+          "delta": 1,
           "error": null
         }
       ]
@@ -430,6 +436,12 @@
           "total_sales": 40,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 41,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -640,6 +652,12 @@
           "total_sales": 86,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 87,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -847,6 +865,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 24,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 24,
           "delta": 0,
           "error": null
@@ -1060,6 +1084,12 @@
           "total_sales": 57,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 58,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -1267,6 +1297,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 0,
           "delta": null,
           "error": "parse failed (selector may have changed)"
@@ -1480,6 +1516,12 @@
           "total_sales": 482,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 483,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -1690,6 +1732,12 @@
           "total_sales": 183,
           "delta": 3,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 183,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -1897,6 +1945,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 276,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 276,
           "delta": 0,
           "error": null
@@ -2110,6 +2164,12 @@
           "total_sales": 492,
           "delta": null,
           "error": "HTTP 410"
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 492,
+          "delta": null,
+          "error": "HTTP 410"
         }
       ]
     },
@@ -2319,6 +2379,12 @@
           "date": "2026-05-25",
           "total_sales": 725,
           "delta": 11,
+          "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 732,
+          "delta": 7,
           "error": null
         }
       ]
@@ -2530,6 +2596,12 @@
           "total_sales": 30,
           "delta": 3,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 30,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -2740,6 +2812,12 @@
           "total_sales": 82,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 83,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -2947,6 +3025,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 306,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 306,
           "delta": 0,
           "error": null
@@ -3160,6 +3244,12 @@
           "total_sales": 383,
           "delta": 1,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 384,
+          "delta": 1,
+          "error": null
         }
       ]
     },
@@ -3370,6 +3460,12 @@
           "total_sales": 2,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 2,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -3502,6 +3598,12 @@
           "total_sales": 21,
           "delta": 8,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 23,
+          "delta": 2,
+          "error": null
         }
       ]
     },
@@ -3631,6 +3733,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 0,
           "delta": null,
           "error": "parse failed (selector may have changed)"
@@ -3766,6 +3874,12 @@
           "total_sales": 6,
           "delta": 4,
           "error": null
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 6,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -3895,6 +4009,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 0,
+          "delta": null,
+          "error": "parse failed (selector may have changed)"
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 0,
           "delta": null,
           "error": "parse failed (selector may have changed)"
@@ -4030,6 +4150,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "blocked (Security Measure)"
+        },
+        {
+          "date": "2026-05-26",
+          "total_sales": 0,
+          "delta": null,
+          "error": "blocked (Security Measure)"
         }
       ]
     },
@@ -4093,6 +4219,12 @@
         },
         {
           "date": "2026-05-25",
+          "total_sales": 0,
+          "delta": null,
+          "error": "blocked (Security Measure)"
+        },
+        {
+          "date": "2026-05-26",
           "total_sales": 0,
           "delta": null,
           "error": "blocked (Security Measure)"
