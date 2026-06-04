@@ -1,17 +1,17 @@
 {
   "crochet": {
-    "cached_at": "2026-06-03T02:02:01+00:00",
+    "cached_at": "2026-06-04T01:01:41+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "dying",
-      "opportunity_score": 57.7,
+      "opportunity_score": 57.6,
       "competition": "very_high",
       "action": "competitive",
       "trend": "declining",
-      "trend_strength": -0.2433,
-      "revenue_change_pct": -59.73,
+      "trend_strength": -0.2953,
+      "revenue_change_pct": -35.94,
       "price_range": "5-20",
-      "total_listings": 3652,
+      "total_listings": 3685,
       "demand_supply_ratio": 0.14,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
