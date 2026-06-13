@@ -1,6 +1,6 @@
 {
   "crochet": {
-    "cached_at": "2026-06-12T01:59:46+00:00",
+    "cached_at": "2026-06-13T01:01:56+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
@@ -9,9 +9,9 @@
       "action": "competitive",
       "trend": "insufficient_data",
       "trend_strength": 0.0,
-      "revenue_change_pct": 48.15,
+      "revenue_change_pct": -25.03,
       "price_range": "5-20",
-      "total_listings": 3910,
+      "total_listings": 3934,
       "demand_supply_ratio": 0.13,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
@@ -19,12 +19,12 @@
       "top_shop_country": "US",
       "top_shop_revenue_usd": 84709.43,
       "top_shop_listings": 10,
-      "top_shop_sample_listing_id": 4392560912,
-      "top_listing_id": 4396392848,
-      "top_listing_title": "Clover poncho crochet pattern *DIGITAL PDF*",
-      "top_listing_price_usd": 8.01,
-      "top_listing_total_sold": 3339,
-      "top_listing_revenue_usd": 20034.0
+      "top_shop_sample_listing_id": 0,
+      "top_listing_id": 4380056270,
+      "top_listing_title": "Handmade Crochet Amigurumi Voodoo Doll Plushie - Medium",
+      "top_listing_price_usd": 37.5,
+      "top_listing_total_sold": 24,
+      "top_listing_revenue_usd": 900.0
     }
   }
 }
