@@ -1,18 +1,18 @@
 {
   "crochet": {
-    "cached_at": "2026-07-01T02:02:55+00:00",
+    "cached_at": "2026-07-02T02:02:44+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
-      "opportunity_score": 57.2,
+      "opportunity_score": 57.1,
       "competition": "very_high",
       "action": "competitive",
       "trend": "insufficient_data",
       "trend_strength": 0.0,
-      "revenue_change_pct": -12.19,
+      "revenue_change_pct": 452.31,
       "price_range": "5-20",
-      "total_listings": 4332,
-      "demand_supply_ratio": 0.1,
+      "total_listings": 4364,
+      "demand_supply_ratio": 0.09,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
       "top_shop_id": 32081894,
