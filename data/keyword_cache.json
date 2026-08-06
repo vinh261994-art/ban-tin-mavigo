@@ -1,6 +1,6 @@
 {
   "crochet": {
-    "cached_at": "2026-08-05T02:02:51+00:00",
+    "cached_at": "2026-08-06T02:02:44+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
@@ -9,9 +9,9 @@
       "action": "competitive",
       "trend": "insufficient_data",
       "trend_strength": 0.0,
-      "revenue_change_pct": 0.0,
+      "revenue_change_pct": 157.59,
       "price_range": "5-20",
-      "total_listings": 5354,
+      "total_listings": 5378,
       "demand_supply_ratio": 0.07,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
