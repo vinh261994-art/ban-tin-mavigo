@@ -1,6 +1,6 @@
 {
   "crochet": {
-    "cached_at": "2026-08-19T02:02:47+00:00",
+    "cached_at": "2026-08-20T02:02:52+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
@@ -9,7 +9,7 @@
       "action": "competitive",
       "trend": "insufficient_data",
       "trend_strength": 0.0,
-      "revenue_change_pct": 0.0,
+      "revenue_change_pct": -7.27,
       "price_range": "5-20",
       "total_listings": 5703,
       "demand_supply_ratio": 0.06,
