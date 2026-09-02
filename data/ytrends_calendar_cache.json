@@ -1,5 +1,5 @@
 {
-  "cached_at": "2026-08-25T02:02:40+00:00",
+  "cached_at": "2026-09-02T02:02:22+00:00",
   "data": {
     "data": {
       "events": [
@@ -17,7 +17,7 @@
           "avg_sold_24h": 0.2,
           "avg_views_24h": 3.33,
           "views_velocity": 1.29,
-          "avg_data_age_days": 36.5,
+          "avg_data_age_days": 44.5,
           "listings_per_seller": 30,
           "revenue_per_seller": 2650.3,
           "pct_with_sales": 13.33,
@@ -53,7 +53,7 @@
           "avg_sold_24h": 0.4,
           "avg_views_24h": 6.82,
           "views_velocity": 2.07,
-          "avg_data_age_days": 35.6,
+          "avg_data_age_days": 43.6,
           "listings_per_seller": 7.8,
           "revenue_per_seller": 617.43,
           "pct_with_sales": 19.23,
@@ -89,7 +89,7 @@
           "avg_sold_24h": 0.11,
           "avg_views_24h": 2.74,
           "views_velocity": 0.95,
-          "avg_data_age_days": 43.7,
+          "avg_data_age_days": 51.7,
           "listings_per_seller": 35,
           "revenue_per_seller": 1502.54,
           "pct_with_sales": 8.57,
@@ -149,11 +149,11 @@
       }
     ],
     "snapshot": {
-      "as_of_date": "2026-08-25",
+      "as_of_date": "2026-09-02",
       "dataset_note": "YTrends indexes a curated subset of Etsy; metrics reflect per-listing snapshots, not live Etsy state.",
-      "median_data_age_days": 65,
-      "pct_fresh_14d": 0.0132314665,
-      "age_p90_days": 150,
+      "median_data_age_days": 73,
+      "pct_fresh_14d": 0,
+      "age_p90_days": 158,
       "newest_creation_date": "2026-07-25",
       "cache_age_seconds": 0
     },
