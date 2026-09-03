@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-02T02:02:20+00:00",
+  "last_updated": "2026-09-03T02:02:26+00:00",
   "shops": {
     "GoVinh": {
       "platform": "etsy",
@@ -811,6 +811,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 40,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 40,
           "delta": 0,
           "error": null
@@ -1630,6 +1636,12 @@
           "total_sales": 42,
           "delta": null,
           "error": "HTTP 410"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 42,
+          "delta": null,
+          "error": "HTTP 410"
         }
       ]
     },
@@ -2437,6 +2449,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 412,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 412,
           "delta": null,
           "error": "HTTP 403"
@@ -3250,6 +3268,12 @@
           "total_sales": 38,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 38,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -4057,6 +4081,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 241,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 241,
           "delta": null,
           "error": "HTTP 403"
@@ -4870,6 +4900,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -5677,6 +5713,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 502,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 502,
           "delta": null,
           "error": "HTTP 403"
@@ -6490,6 +6532,12 @@
           "total_sales": 340,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 340,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -7297,6 +7345,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 346,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 346,
           "delta": null,
           "error": "HTTP 403"
@@ -8110,6 +8164,12 @@
           "total_sales": 492,
           "delta": null,
           "error": "HTTP 410"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 492,
+          "delta": null,
+          "error": "HTTP 410"
         }
       ]
     },
@@ -8920,6 +8980,12 @@
           "total_sales": 1126,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 1126,
+          "delta": null,
+          "error": "ERR 429"
         }
       ]
     },
@@ -9730,6 +9796,12 @@
           "total_sales": 30,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 30,
+          "delta": null,
+          "error": "ERR 429"
         }
       ]
     },
@@ -10537,6 +10609,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 88,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 88,
           "delta": 0,
           "error": null
@@ -11350,6 +11428,12 @@
           "total_sales": 306,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 306,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -12157,6 +12241,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 414,
+          "delta": 0,
+          "error": null
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 414,
           "delta": 0,
           "error": null
@@ -12970,6 +13060,12 @@
           "total_sales": 3,
           "delta": 0,
           "error": null
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 3,
+          "delta": 0,
+          "error": null
         }
       ]
     },
@@ -13699,6 +13795,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 739,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 739,
           "delta": null,
           "error": "HTTP 403"
@@ -14434,6 +14536,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -15163,6 +15271,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 157,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 157,
           "delta": null,
           "error": "HTTP 403"
@@ -15898,6 +16012,12 @@
           "total_sales": 98,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 98,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -16630,6 +16750,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -17296,6 +17422,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -17713,6 +17845,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 62,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 62,
           "delta": null,
           "error": "HTTP 403"
@@ -18136,6 +18274,12 @@
           "total_sales": 86,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 86,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -18553,6 +18697,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 278,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 278,
           "delta": null,
           "error": "HTTP 403"
@@ -18976,6 +19126,12 @@
           "total_sales": 18,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 18,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -19393,6 +19549,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 24,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 24,
           "delta": null,
           "error": "HTTP 403"
@@ -19816,6 +19978,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -20233,6 +20401,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
@@ -20656,6 +20830,12 @@
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
         }
       ]
     },
@@ -21073,6 +21253,12 @@
         },
         {
           "date": "2026-09-02",
+          "total_sales": 0,
+          "delta": null,
+          "error": "HTTP 403"
+        },
+        {
+          "date": "2026-09-03",
           "total_sales": 0,
           "delta": null,
           "error": "HTTP 403"
