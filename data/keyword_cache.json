@@ -1,30 +1,30 @@
 {
   "crochet": {
-    "cached_at": "2026-10-09T02:02:36+00:00",
+    "cached_at": "2026-10-10T02:02:26+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
-      "opportunity_score": 44.0,
+      "opportunity_score": 44.1,
       "competition": "very_high",
       "action": "competitive",
       "trend": "?",
       "trend_strength": 0.0,
       "revenue_change_pct": 0.0,
       "price_range": "5-20",
-      "total_listings": 6881,
+      "total_listings": 6978,
       "demand_supply_ratio": 0.06,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
       "top_shop_id": 32081894,
       "top_shop_country": "US",
-      "top_shop_revenue_usd": 150595.59,
+      "top_shop_revenue_usd": 152890.19,
       "top_shop_listings": 20,
       "top_shop_sample_listing_id": 0,
-      "top_listing_id": 4380056270,
-      "top_listing_title": "Handmade Crochet Amigurumi Voodoo Doll Plushie - Medium",
-      "top_listing_price_usd": 37.5,
-      "top_listing_total_sold": 24,
-      "top_listing_revenue_usd": 900.0
+      "top_listing_id": 1817498051,
+      "top_listing_title": "Premium Multicolor Crochet Cord | 5mm Polyester Yarn | 400m Gradient Macrame Cord for Bags, Baskets & Home Decor | Made in Brazil",
+      "top_listing_price_usd": 37.32,
+      "top_listing_total_sold": 155,
+      "top_listing_revenue_usd": 5784.6
     }
   }
 }
