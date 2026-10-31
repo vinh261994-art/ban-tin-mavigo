@@ -1,6 +1,6 @@
 {
   "crochet": {
-    "cached_at": "2026-10-30T02:02:38+00:00",
+    "cached_at": "2026-10-31T02:02:28+00:00",
     "report": {
       "keyword": "crochet",
       "bucket": "stable",
@@ -11,7 +11,7 @@
       "trend_strength": 0.0,
       "revenue_change_pct": 0.0,
       "price_range": "5-20",
-      "total_listings": 7349,
+      "total_listings": 7404,
       "demand_supply_ratio": 0.06,
       "error": "",
       "action_reason_en": "Decent market but crowded — need strong differentiation",
@@ -20,11 +20,11 @@
       "top_shop_revenue_usd": 160410.83,
       "top_shop_listings": 21,
       "top_shop_sample_listing_id": 0,
-      "top_listing_id": 1817498051,
-      "top_listing_title": "Premium Multicolor Crochet Cord | 5mm Polyester Yarn | 400m Gradient Macrame Cord for Bags, Baskets & Home Decor | Made in Brazil",
-      "top_listing_price_usd": 37.32,
-      "top_listing_total_sold": 155,
-      "top_listing_revenue_usd": 5784.6
+      "top_listing_id": 4550590747,
+      "top_listing_title": "Patrón de honguito chanterelle a crochet. PDF digital Esp/Eng. Descarga digital",
+      "top_listing_price_usd": 7.69,
+      "top_listing_total_sold": 27,
+      "top_listing_revenue_usd": 3510.0
     }
   }
 }
